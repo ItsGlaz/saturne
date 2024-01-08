@@ -1,0 +1,1 @@
+#fichier gérant les interactions entre l'interface et les fichiers fonctionnels
