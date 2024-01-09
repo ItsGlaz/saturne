@@ -3,26 +3,23 @@ import customtkinter as ct
 import json
 import tool_tip as tl
 import intermediateLayer
+from app_editing_file import AppEditing
 
 class interface(ct.CTk):
 
     def __init__(self) -> None:
         super().__init__()
+        
+        self.getSettings()
 
-        ct.set_default_color_theme("dark-blue")  #Themes: "blue" (standard), "green", "dark-blue"
-        with open("window_parameters.json", "r") as file :
-            parameters = json.load(file)
+        self.createInterface()
 
-        self.width = parameters["width"]
-        self.height = parameters["height"]
-        ct.set_default_color_theme(parameters["theme"])
+        self.settings = None
 
-        self.geometry("1080x720")
-        self.minsize(self.width, self.height)
-
-
-
+    def createInterface(self) :
+        
         #-------------------- création des frames --------------------
+        
         self.main_frame = ct.CTkFrame(self)
         
         self.show_frame = ct.CTkFrame(self.main_frame, width=self.width*(50/100), height=self.height, border_width=2, border_color="#000000")
@@ -50,7 +47,7 @@ class interface(ct.CTk):
         tl.CreateToolTip(self.add_button, text = "Bouton d'ajout de widgets dans le projet.")
 
         self.parameter_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100), bg_color= 'transparent',
-                                             text = "paramètres", font = ("arial", 15), corner_radius= 10)
+                                             text = "paramètres", font = ("arial", 15), corner_radius= 10, command = lambda : self.openParameters())
         tl.CreateToolTip(self.parameter_button, text = "Bouton d'ouverture de la fenêtre de paramètres.")
 
         self.modify_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100), bg_color= 'transparent',
@@ -73,7 +70,35 @@ class interface(ct.CTk):
 
 
     def openParameters(self):
-        pass
+        if self.settings == None :
+            self.settings = AppEditing(self.parameters)
+            self.parameters = self.settings.get()
+            self.settings = None
+            self.getSettings()
+            self.clear()
+        else :
+            print("fenêtre de paramètres déjà ouverte")
+
+
+    def getSettings(self):
+        with open("window_parameters.json", "r") as file :
+            self.parameters = json.load(file)
+        file.close()
+        self.width = self.parameters["width"]
+        self.height = self.parameters["height"]
+        ct.set_default_color_theme(self.parameters["color"])
+        ct.set_appearance_mode(self.parameters["theme"])
+        
+        self.geometry(f"{str(self.width)}x{str(self.height)}")
+        self.minsize(self.width, self.height)
+
+
+    def clear(self):
+        liste = self.grid_slaves() + self.pack_slaves()
+        print(liste)
+        for element in liste :
+            element.destroy()
+        self.createInterface()
 
 
     def fileLoading(self):
