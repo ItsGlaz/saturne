@@ -4,17 +4,22 @@ import json
 import tool_tip as tl
 import intermediateLayer
 from app_editing_file import AppEditing
+from widgetApp import *
 
 class interface(ct.CTk):
 
     def __init__(self) -> None:
         super().__init__()
         
+        self.widgets_list = []
+        self.settings = None
+        self.widgetapp = None
         self.getSettings()
 
-        self.createInterface()
 
-        self.settings = None
+        self.createInterface()
+        self.sideWidgetsUptdating()
+
 
     def createInterface(self) :
         
@@ -43,24 +48,19 @@ class interface(ct.CTk):
         #-------------------- création des widgets des paramètres --------------------
 
 
-        self.add_button = ct.CTkButton(self.main_item_frame,  width= self.width*(15/100), height= self.height*(6/100), text = "ajouter", font = ("arial", 15), corner_radius= 10, anchor = "center")
-        tl.CreateToolTip(self.add_button, text = "Bouton d'ajout de widgets dans le projet.")
-
         self.parameter_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100), bg_color= 'transparent',
-                                             text = "paramètres", font = ("arial", 15), corner_radius= 10, command = lambda : self.openParameters())
+                                             text = "paramètres", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : self.openParameters())
         tl.CreateToolTip(self.parameter_button, text = "Bouton d'ouverture de la fenêtre de paramètres.")
 
         self.modify_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100), bg_color= 'transparent',
-                                             text = "modifier", font = ("arial", 15), corner_radius= 10)
+                                             text = "modifier", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10)
         tl.CreateToolTip(self.modify_button, text = "Bouton de modification des paramètres d'un widget.")
 
         self.delete_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100), bg_color= 'transparent',
-                                             text = "supprimer", font = ("arial", 15), corner_radius= 10)
+                                             text = "supprimer", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10)
         tl.CreateToolTip(self.delete_button, text = "Bouton de suppression d'un widget.")
 
         
-        
-        self.add_button.grid(ipadx = 20)
         self.delete_button.place(x = self.width*(5/200), y = self.height*(3/200))
         self.modify_button.place(x = self.width*(35/200), y = self.height*(3/200))
         self.parameter_button.place(x = self.width*(70/200), y = self.height*(3/200))
@@ -75,9 +75,10 @@ class interface(ct.CTk):
             self.parameters = self.settings.get()
             self.settings = None
             self.getSettings()
-            self.clear()
+            self.clear('all')
         else :
             print("fenêtre de paramètres déjà ouverte")
+            self.settings.focus()
 
 
     def getSettings(self):
@@ -93,12 +94,17 @@ class interface(ct.CTk):
         self.minsize(self.width, self.height)
 
 
-    def clear(self):
-        liste = self.grid_slaves() + self.pack_slaves()
-        print(liste)
-        for element in liste :
-            element.destroy()
-        self.createInterface()
+    def clear(self, mod):
+        if mod == 'all' :
+            liste = self.grid_slaves() + self.pack_slaves()
+            print(liste)
+            for element in liste :
+                element.destroy()
+            self.createInterface()
+        if mod == 'itemFrame' :
+            liste = self.main_item_frame.grid_slaves()
+            for element in liste :
+                element.destroy()
 
 
     def fileLoading(self):
@@ -106,11 +112,31 @@ class interface(ct.CTk):
 
 
     def sideWidgetsUptdating(self):
-        pass
+        self.clear('itemFrame')
+        
+        self.add_button = ct.CTkButton(self.main_item_frame, width= self.width*(18/100), height= self.height*(6/100), text = "ajouter", 
+                                       font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command= lambda : self.widgetAdding())
+        tl.CreateToolTip(self.add_button, text = "Bouton d'ajout de widgets dans le projet.")
+
+        self.add_button.grid(padx = 5, pady = 5)
+
+        for widgets in self.widgets_list :
+            w_bt = ct.CTkButton(self.main_item_frame, text = widgets, width= self.width*(18/100), height= self.height*(6/100), 
+                                font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda w_id : self.widgetParametersFrame(w_id))
+            w_bt.grid(padx = 5, pady = 5)
 
 
     def widgetAdding(self):
-        pass
+        if self.widgetapp == None :
+            self.widgetapp = WidgetApp()
+            self.widgets_list.append(self.widgetapp.get())
+            self.widgetapp = None
+            self.sideWidgetsUptdating()
+        else :
+            print("fenêtre d'ajout d'un widget déjà ouverte")
+            self.widgetapp.focus()
+
+
 
         
     def widgetParametersFrame(self):
