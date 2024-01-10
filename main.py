@@ -5,6 +5,7 @@ import tool_tip as tl
 import intermediateLayer
 from app_editing_file import AppEditing
 from widgetApp import *
+from projectApp import ProjectApp
 
 class interface(ct.CTk):
 
@@ -14,6 +15,7 @@ class interface(ct.CTk):
         self.widgets_list = []
         self.settings = None
         self.widgetapp = None
+        self.project_app = None
         self.getSettings()
 
 
@@ -53,7 +55,7 @@ class interface(ct.CTk):
         tl.CreateToolTip(self.parameter_button, text = "Bouton d'ouverture de la fenêtre de paramètres.")
 
         self.modify_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100), bg_color= 'transparent',
-                                             text = "modifier", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10)
+                                             text = "modifier", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : self.openProjectApp())
         tl.CreateToolTip(self.modify_button, text = "Bouton de modification des paramètres d'un widget.")
 
         self.delete_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100), bg_color= 'transparent',
@@ -117,7 +119,6 @@ class interface(ct.CTk):
         self.add_button = ct.CTkButton(self.main_item_frame, width= self.width*(18/100), height= self.height*(6/100), text = "ajouter", 
                                        font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command= lambda : self.widgetAdding())
         tl.CreateToolTip(self.add_button, text = "Bouton d'ajout de widgets dans le projet.")
-
         self.add_button.grid(padx = 5, pady = 5)
 
         for widgets in self.widgets_list :
@@ -136,8 +137,6 @@ class interface(ct.CTk):
             print("fenêtre d'ajout d'un widget déjà ouverte")
             self.widgetapp.focus()
 
-
-
         
     def widgetParametersFrame(self):
         pass
@@ -145,6 +144,11 @@ class interface(ct.CTk):
 
     def previewFrame(self):
         pass
+
+
+    def openProjectApp(self):
+        self.project_app = ProjectApp()
+
         
 
 if __name__ == "__main__":
