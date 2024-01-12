@@ -1,10 +1,12 @@
 #fichier contenant l'interface graphique du programme
+#ajouter une barre de menu pour :
+
 import customtkinter as ct
 import json
 import tool_tip as tl
 import intermediateLayer
-from app_editing_file import AppEditing
-from widgetApp import *
+from settingsApp import AppEditing
+from widgetApp import WidgetApp
 from projectApp import ProjectApp
 
 class interface(ct.CTk):
@@ -20,7 +22,6 @@ class interface(ct.CTk):
 
 
         self.createInterface()
-        self.sideWidgetsUptdating()
 
 
     def createInterface(self) :
@@ -55,7 +56,7 @@ class interface(ct.CTk):
         tl.CreateToolTip(self.parameter_button, text = "Bouton d'ouverture de la fenêtre de paramètres.")
 
         self.modify_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100), bg_color= 'transparent',
-                                             text = "modifier", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : self.openProjectApp())
+                                             text = "modifier", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : self.openProjectApp())#modifier ici la fonction
         tl.CreateToolTip(self.modify_button, text = "Bouton de modification des paramètres d'un widget.")
 
         self.delete_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100), bg_color= 'transparent',
@@ -66,6 +67,8 @@ class interface(ct.CTk):
         self.delete_button.place(x = self.width*(5/200), y = self.height*(3/200))
         self.modify_button.place(x = self.width*(35/200), y = self.height*(3/200))
         self.parameter_button.place(x = self.width*(70/200), y = self.height*(3/200))
+
+        self.sideWidgetsUptdating()
 
 
     #-------------------- création des fonctions --------------------    
@@ -130,7 +133,10 @@ class interface(ct.CTk):
     def widgetAdding(self):
         if self.widgetapp == None :
             self.widgetapp = WidgetApp()
-            self.widgets_list.append(self.widgetapp.get())
+            self.widgetapp.focus()
+            newwidget = self.widgetapp.get()
+            if newwidget != None :
+                self.widgets_list.append()
             self.widgetapp = None
             self.sideWidgetsUptdating()
         else :

@@ -1,4 +1,8 @@
 #fichier pour l'interface de paramètres
+#ajouter le dimensionnement de l'intefaces ( via des dimensions pré-définies)
+#ajouter l'apparition des tooltip ou non
+#ajouter le niveau de détail des paramètres des widgets
+
 from typing import Optional, Tuple, Union
 from copy import deepcopy
 import customtkinter as ct 
@@ -13,7 +17,7 @@ class AppEditing(ct.CTkToplevel):
         self.color = ct.StringVar()
         self.theme = ct.StringVar()
         self.theme_translation = {"eng-fra" : {"green" : "Vert", "dark-blue" : "Bleu foncé", "blue" : "Bleu", "system" : "Système", "dark" : "Sombre", "light" : "Clair"}, 
-                                  "fra-eng": {"Vert" : "green", "Bleu" : "blue", "Bleu foncé" : "dark-blue", "Système" : "system", "Sombre" : "dark", "Clair" : "light"}}
+                                  "fra-eng" : {"Vert" : "green", "Bleu" : "blue", "Bleu foncé" : "dark-blue", "Système" : "system", "Sombre" : "dark", "Clair" : "light"}}
          
         self.main_frame = ct.CTkFrame(self)
 
@@ -67,6 +71,3 @@ class AppEditing(ct.CTkToplevel):
     def get(self):
         self.master.wait_window(self)
         return self.parameters
-
-
-
