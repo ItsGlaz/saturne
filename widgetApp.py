@@ -1,31 +1,35 @@
 #fichier contenant les widgets à créer
+#modifier la manière dont est construite l'interface
 from typing import Optional, Tuple, Union
 import customtkinter as ct
+import json
+
 
 class WidgetApp(ct.CTkToplevel):
 
     def __init__(self):
         super().__init__()
 
+        self.getWidget()
         self.choice = None
 
         self.main_frame = ct.CTkScrollableFrame(self, width=360, height = 150)
         self.main_frame.grid()
 
-        self.frame_button = ct.CTkButton(self.main_frame, text = "Frame", font=ct.CTkFont(size=15, weight="bold"), width=160,height = 40, command = lambda x="Frame" : self.choiceDone(x))
-        self.label_button = ct.CTkButton(self.main_frame, text = "Label", font=ct.CTkFont(size=15, weight="bold"), width=160, height = 40, command = lambda x="Label" : self.choiceDone(x))
-        self.entry_button = ct.CTkButton(self.main_frame, text = "Entrée", font=ct.CTkFont(size=15, weight="bold"), width=160, height = 40, command = lambda x="Entry" : self.choiceDone(x))
-        self.button_button = ct.CTkButton(self.main_frame, text = "Bouton", font=ct.CTkFont(size=15, weight="bold"), width=160, height = 40, command = lambda x="Button" : self.choiceDone(x))
-        self.checkbox_button = ct.CTkButton(self.main_frame, text = "Case à cocher", font=ct.CTkFont(size=15, weight="bold"), width=160, height = 40, command = lambda x="Checkbox" : self.choiceDone(x))
-        self.list_button = ct.CTkButton(self.main_frame, text = "Liste", font=ct.CTkFont(size=15, weight="bold"), width=160, height = 40, command = lambda x="Listbox" : self.choiceDone(x))
+        r_ind = 0
+        c_ind = 0
+        for elements in self.widgets_list :
+            self.bt = ct.CTkButton(self.main_frame, text = elements["name"], font=ct.CTkFont(size=15, weight="bold"), width=160,height = 40, command = lambda x=elements["id"] : self.choiceDone(x))
+            self.bt.grid(row = r_ind, column = c_ind, padx = 10, pady = 10)
+            
+            c_ind = c_ind + 1 if c_ind == 0 else 0
+            r_ind +=1 if c_ind == 0 else 0
 
-        self.frame_button.grid(row = 0, column = 0, padx = 10, pady = 10)
-        self.label_button.grid(row = 0, column = 1, padx = 10, pady = 10)
-        self.entry_button.grid(row = 1, column = 0, padx = 10, pady = 10)
-        self.button_button.grid(row = 1, column = 1, padx = 10, pady = 10)
-        self.checkbox_button.grid(row = 2, column = 0, padx = 10, pady = 10)
-        self.list_button.grid(row = 2, column = 1, padx = 10, pady = 10)
-        
+
+    def getWidget(self):
+        with open("widgetRss.json", "r") as file :
+            self.widgets_list = json.load(file)
+        file.close()
 
 
     def choiceDone(self, choice):

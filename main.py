@@ -4,7 +4,7 @@
 import customtkinter as ct
 import json
 import tool_tip as tl
-import intermediateLayer
+import intermediateLayer as interl
 from settingsApp import AppEditing
 from widgetApp import WidgetApp
 from projectApp import ProjectApp
@@ -102,7 +102,6 @@ class interface(ct.CTk):
     def clear(self, mod):
         if mod == 'all' :
             liste = self.grid_slaves() + self.pack_slaves()
-            print(liste)
             for element in liste :
                 element.destroy()
             self.createInterface()
@@ -113,6 +112,7 @@ class interface(ct.CTk):
 
 
     def fileLoading(self):
+        #fonction d'envoi d'une requête au programme de gestion des fichiers
         pass
 
 
@@ -136,7 +136,7 @@ class interface(ct.CTk):
             self.widgetapp.focus()
             newwidget = self.widgetapp.get()
             if newwidget != None :
-                self.widgets_list.append()
+                self.widgets_list.append(newwidget)
             self.widgetapp = None
             self.sideWidgetsUptdating()
         else :
@@ -145,15 +145,21 @@ class interface(ct.CTk):
 
         
     def widgetParametersFrame(self):
+        #crée la fenêtre des paramètres du widget selectionné
         pass
 
 
     def previewFrame(self):
+        #à voir si cette fonction est faite ou non
+        #permet d'afficher l'interface à construire, peut être remplacée par une fenêtre à part
         pass
 
 
     def openProjectApp(self):
         self.project_app = ProjectApp()
+        newprojectname = self.project_app.get()
+        if newprojectname != None and str(newprojectname) == str :
+            interl.newPrjctRequest(newprojectname)
 
         
 

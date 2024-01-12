@@ -1,0 +1,26 @@
+[
+    {
+        "name" : "Frame",
+        "id" : "Frame"
+    },
+    {
+        "name" : "Label",
+        "id" : "Label"
+    },
+    {
+        "name" : "Entrée",
+        "id" :  "Entry"
+    },
+    {
+        "name" : "Bouton",
+        "id" : "Button"
+    },
+    {
+        "name" : "Case à cocher",
+        "id" : "Checkbox"
+    },
+    {
+        "name" : "Liste",
+        "id" : "Listbox"
+    }
+]

@@ -7,7 +7,7 @@ class ProjectApp(ct.CTkToplevel):
     def __init__(self):
         super().__init__()
 
-
+        self.newprojectname = None
 
         self.geometry("480x300")
         self.main_frame = ct.CTkFrame(self)
@@ -49,8 +49,8 @@ class ProjectApp(ct.CTkToplevel):
 
 
     def addProject(self):
-        name = self.entry.get()
-        self.project_info[name] = []
+        self.newprojectname = self.entry.get()
+        self.project_info[self.newprojectname] = []
         with open("projectInfoSave.json", "w") as file :
             json.dump(self.project_info, file)
         file.close()
@@ -63,3 +63,8 @@ class ProjectApp(ct.CTkToplevel):
             liste = self.side_frame.grid_slaves()
             for widgets in liste :
                 widgets.destroy()
+
+    
+    def get(self):
+        self.master.wait_window(self)
+        return self.newprojectname
