@@ -11,3 +11,7 @@ def newPrjctRequest(name : str):
         nom du dossier à créer
     """
     fileop.directoryCreation(name)
+
+
+def rmproject(name):
+    fileop.rmDirectory(name)

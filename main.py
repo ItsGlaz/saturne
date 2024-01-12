@@ -158,7 +158,7 @@ class interface(ct.CTk):
     def openProjectApp(self):
         self.project_app = ProjectApp()
         newprojectname = self.project_app.get()
-        if newprojectname != None and str(newprojectname) == str :
+        if newprojectname != None and type(newprojectname) == str :
             interl.newPrjctRequest(newprojectname)
 
         
