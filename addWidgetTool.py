@@ -13,6 +13,8 @@ class AddWidgetTool(ct.CTk):
             self.validparameters = json.load(file)
             file.close()
         self.entries = [] 
+        
+        self.readFile()
 
         self.upper_frame = ct.CTkFrame(self)
         self.lower_frame = ct.CTkFrame(self) 
@@ -20,24 +22,28 @@ class AddWidgetTool(ct.CTk):
         self.upper_frame.grid(row =0, column = 0)    
         self.lower_frame.grid(row = 1, column = 0)  
         
-        self.framecreation()
+        self.frameCreation()
 
 
-    def framecreation(self):
+    def frameCreation(self):
         self.entry_name = ct.CTkEntry(self.upper_frame, width=200)
         self.entry_name.insert(0, 'nom du widget')
+        
         self.entry_id = ct.CTkEntry(self.upper_frame, width=200)
         self.entry_id.insert(0, 'id du widget')
-        self.entry_name.grid(row = 0, column =0)
-        self.entry_id.grid (row = 0, column = 1)
         
+        self.entry_name.grid(row = 0, column =0, padx= 5)
+        self.entry_id.grid (row = 0, column = 1, padx= 5)
+        
+        self.add_bt = ct.CTkButton(self.upper_frame, text = "valider", command = lambda : self.addWidgetParameter())
+        self.add_bt.grid(row =0, column = 3, padx= 5)
         
         row =0
         column =0
         for parameters in self.validparameters[1].keys():
         
-            check = ct.CTkCheckBox(self.lower_frame, text = parameters)
-            self.entries.append(check)
+            check = ct.CTkCheckBox(self.lower_frame, text = parameters, command = lambda x = parameters : self.addtoListe(x) )
+            #self.entries.append(check)
 
             check.grid(row = row, column = column, padx= 5, pady = 5)
             
@@ -45,10 +51,34 @@ class AddWidgetTool(ct.CTk):
             row += 1 if column == 0 else 0
 
 
+    def addtoListe(self, add : str):
+        self.entries.append(add)
+
+    def readFile(self):
+        with open("widgetInfo.json", "r") as file :
+            self.widget_info = json.load(file)
+        file.close()
 
     def addWidgetParameter(self):
-        for entries in self.entries :
-            pass
+        dico = {}
+        dico["name"]        = self.entry_name.get()
+        dico["id"]          = self.entry_id.get()
+        dico["parameters"]  = self.entries
+        
+        self.widget_info.append(dico)
+        self.clear()
+        self.frameCreation()
+        
+        with open("widgetInfo.json", "w") as file :
+            json.dump(self.widget_info, file)
+        file.close()
+
+
+    def clear(self):
+        liste = self.upper_frame.grid_slaves() + self.lower_frame.grid_slaves()
+        for element in liste :
+            element.destroy()
+
 
 
 if __name__ == "__main__" :
