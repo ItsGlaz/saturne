@@ -5,11 +5,10 @@ import intermediateLayer as interl
 
 class ProjectApp(ct.CTkToplevel):
 
-    def __init__(self):
+    def __init__(self, mod = None):
         super().__init__()
 
         self.newprojectname = None
-
         self.geometry("480x300")
         self.main_frame = ct.CTkFrame(self)
         self.side_frame = ct.CTkScrollableFrame(self.main_frame, height = 300, width = 180)
@@ -18,8 +17,9 @@ class ProjectApp(ct.CTkToplevel):
         self.main_frame.grid()
         self.side_frame.grid(row = 0, column =0)
         self.work_frame.grid(row =0, column = 1)
-
+        
         self.sideFrameUpdating()
+        if mod == "new" : self.workFrameCreation()
 
 
     def workFrameCreation(self):
@@ -109,6 +109,11 @@ class ProjectApp(ct.CTkToplevel):
         for widgets in liste :
             widgets.destroy()
     
+
+    def closed(self):
+        self.master.wait_window(self)
+        return None
+        
 
 if __name__ == "__main__" :
     testapp = ProjectApp()

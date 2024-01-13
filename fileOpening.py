@@ -47,4 +47,3 @@ def rmFile(path):
     files_list = os.listdir(path)
     for files in files_list :
         os.remove(path + "\\" + files)
-

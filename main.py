@@ -1,6 +1,6 @@
 #fichier contenant l'interface graphique du programme
 #ajouter une barre de menu pour :
-
+import tkinter as tk
 import customtkinter as ct
 import json
 import tool_tip as tl
@@ -46,6 +46,21 @@ class interface(ct.CTk):
         
         self.main_item_frame.grid()
         self.parameter_frame.grid(row = 1,column =1, columnspan = 2 )
+
+
+        #-------------------- création du menu --------------------
+
+
+        self.menubar = tk.Menu(self)
+        self.config(menu=self.menubar)
+
+        self.fichier = tk.Menu(self.menubar, tearoff = False)
+        self.fichier.add_command(label = "ouvrir un projet", command = lambda x = None : self.openProjectApp(x))
+        self.fichier.add_command(label = "nouveau projet", command = lambda x = "new" : self.openProjectApp(x))
+        self.fichier.add_separator() 
+        self.fichier.add_command(label = "enregistrer", command = lambda : None)
+
+        self.menubar.add_cascade(label = "fichiers", menu = self.fichier)
         
 
         #-------------------- création des widgets des paramètres --------------------
@@ -56,7 +71,7 @@ class interface(ct.CTk):
         tl.CreateToolTip(self.parameter_button, text = "Bouton d'ouverture de la fenêtre de paramètres.")
 
         self.modify_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100), bg_color= 'transparent',
-                                             text = "modifier", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : self.openProjectApp())#modifier ici la fonction
+                                             text = "modifier", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : None)#modifier ici la fonction
         tl.CreateToolTip(self.modify_button, text = "Bouton de modification des paramètres d'un widget.")
 
         self.delete_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100), bg_color= 'transparent',
@@ -155,13 +170,19 @@ class interface(ct.CTk):
         pass
 
 
-    def openProjectApp(self):
-        self.project_app = ProjectApp()
+    def openProjectApp(self, mod = None):
+        print("1",self.project_app)
+        if self.project_app == None :
+            self.project_app = ProjectApp(mod)
+            self.project_app.closed()
+            self.project_app = None
+            print("2",self.project_app)
+        else :
+            print("fenêtre de projets déjà ouverte")
+            #self.project_app.focus()
 
         
 
 if __name__ == "__main__":
     app = interface()
     app.mainloop()
-        
-    

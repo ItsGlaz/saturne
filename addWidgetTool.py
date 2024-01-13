@@ -9,7 +9,7 @@ class AddWidgetTool(ct.CTk):
     def __init__(self, fg_color: str | Tuple[str, str] | None = None, **kwargs):
         super().__init__(fg_color, **kwargs)
 
-        with open("WidgetRss.json", "r",) as file :
+        with open("WidParaInfo.json", "r",) as file :
             self.validparameters = json.load(file)
             file.close()
         self.entries = [] 
@@ -40,10 +40,9 @@ class AddWidgetTool(ct.CTk):
         
         row =0
         column =0
-        for parameters in self.validparameters[1].keys():
+        for parameters in self.validparameters.keys():
         
             check = ct.CTkCheckBox(self.lower_frame, text = parameters, command = lambda x = parameters : self.addtoListe(x) )
-            #self.entries.append(check)
 
             check.grid(row = row, column = column, padx= 5, pady = 5)
             
@@ -52,17 +51,29 @@ class AddWidgetTool(ct.CTk):
 
 
     def addtoListe(self, add : str):
-        self.entries.append(add)
+        if add not in self.entries :
+            self.entries.append(add)
+            print(add)
+
 
     def readFile(self):
         with open("widgetInfo.json", "r") as file :
             self.widget_info = json.load(file)
         file.close()
 
+
     def addWidgetParameter(self):
         dico = {}
         dico["name"]        = self.entry_name.get()
         dico["id"]          = self.entry_id.get()
+
+        with open("widgetRss.json", "r") as file :
+            info = json.load(file)
+            info.append(dico)
+        with open("widgetRss.json", "w") as file :
+            json.dump(info, file)
+        file.close()
+
         dico["parameters"]  = self.entries
         
         self.widget_info.append(dico)
@@ -73,12 +84,14 @@ class AddWidgetTool(ct.CTk):
             json.dump(self.widget_info, file)
         file.close()
 
+        self.entries = []
+        self.readFile()
+
 
     def clear(self):
         liste = self.upper_frame.grid_slaves() + self.lower_frame.grid_slaves()
         for element in liste :
             element.destroy()
-
 
 
 if __name__ == "__main__" :
