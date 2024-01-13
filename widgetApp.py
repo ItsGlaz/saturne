@@ -18,7 +18,7 @@ class WidgetApp(ct.CTkToplevel):
 
         r_ind = 0
         c_ind = 0
-        for elements in self.widgets_list :
+        for elements in self.widgets_list[0] :
             self.bt = ct.CTkButton(self.main_frame, text = elements["name"], font=ct.CTkFont(size=15, weight="bold"), width=160,height = 40, command = lambda x=elements["id"] : self.choiceDone(x))
             self.bt.grid(row = r_ind, column = c_ind, padx = 10, pady = 10)
             

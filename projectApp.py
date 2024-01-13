@@ -47,22 +47,7 @@ class ProjectApp(ct.CTkToplevel):
 
         self.del_bt.grid(row = 0, column = 0, padx = 10, pady = 10)
         self.modify_bt.grid(row = 0, column = 1, padx = 10, pady = 10)
-
-
-
-    def delProject(self, project):
-        del self.project_info[project]
-        with open("projectInfoSave.json", "w") as file :
-            json.dump(self.project_info, file)
-        file.close()
-        if type(project) == str :
-            interl.rmproject(project)
-        
-        self.clear("workFrame")
-        self.clear("sideFrame")
-        self.sideFrameUpdating()
             
-    
 
     def modifyInfo(self):
         pass
@@ -97,6 +82,22 @@ class ProjectApp(ct.CTkToplevel):
             interl.newPrjctRequest(self.newprojectname)
         
         self.clear("sideFrame")
+        self.clear("workFrame")
+        self.sideFrameUpdating()
+        self.modifyFrame(self.newprojectname)
+
+
+
+    def delProject(self, project):
+        del self.project_info[project]
+        with open("projectInfoSave.json", "w") as file :
+            json.dump(self.project_info, file)
+        file.close()
+        if type(project) == str :
+            interl.rmproject(project)
+        
+        self.clear("workFrame")
+        self.clear("sideFrame")
         self.sideFrameUpdating()
 
 
@@ -107,12 +108,6 @@ class ProjectApp(ct.CTkToplevel):
             liste = self.work_frame.grid_slaves()
         for widgets in liste :
             widgets.destroy()
-
-
-    
-    def get(self):
-        self.master.wait_window(self)
-        return self.newprojectname
     
 
 if __name__ == "__main__" :

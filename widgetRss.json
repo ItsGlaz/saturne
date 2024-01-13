@@ -1,5 +1,5 @@
 [
-    {
+    [{
         "name" : "Frame",
         "id" : "Frame"
     },
@@ -20,7 +20,51 @@
         "id" : "Checkbox"
     },
     {
-        "name" : "Liste",
-        "id" : "Listbox"
+        "name" : "Liste combo",
+        "id" : "ComboBox"
+    }],
+    {
+        "master": "",
+        "width":  200,
+        "height":  200,
+        "corner_radius": "None",
+        "border_width": "None",
+        "bg_color": "transparent",
+        "fg_color": "None",
+        "border_color": "None",
+        "background_corner_colors": "None",
+        "overwrite_preferred_drawing_method": "None",
+        "text_color": "None",
+        "text_color_disabled": "None",
+        "text": "",
+        "font": "None",
+        "image": "None",
+        "compound":  "center",
+        "anchor": "center",
+        "wraplength": 0,
+        "textvariable": "None",
+        "placeholder_text": "None",
+        "hover": true,
+        "command" : "None",
+        "hover_color": "None",
+        "round_width_to_even_numbers": true,
+        "round_height_to_even_numbers": true,
+        "border_spacing": 2,
+        "checkbox_width": 24,
+        "checkbox_height": 24,
+        "checkmark_color": "None",
+        "state": "normal",
+        "onvalue": 1,
+        "offvalue": 0,
+        "variable": "None",
+        "button_color": "None",
+        "button_hover_color": "None",
+        "dropdown_fg_color": "None",
+        "dropdown_hover_color": "None",
+        "dropdown_text_color": "None",
+        "justify": "left",
+        "dropdown_font": "None",
+        "values": "None"
+
     }
 ]
