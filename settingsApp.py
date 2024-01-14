@@ -18,41 +18,53 @@ class AppEditing(ct.CTkToplevel):
         self.theme = ct.StringVar()
         self.theme_translation = {"eng-fra" : {"green" : "Vert", "dark-blue" : "Bleu foncé", "blue" : "Bleu", "system" : "Système", "dark" : "Sombre", "light" : "Clair"}, 
                                   "fra-eng" : {"Vert" : "green", "Bleu" : "blue", "Bleu foncé" : "dark-blue", "Système" : "system", "Sombre" : "dark", "Clair" : "light"}}
-         
-        self.main_frame = ct.CTkFrame(self)
 
-        self.sub_main_frame = ct.CTkFrame(self.main_frame)
-        self.bottom_frame = ct.CTkFrame(self.main_frame)
+        self.infotabview = ct.CTkTabview(self)
+        self.infotabview.grid(padx=10, pady=10, sticky="wsen")
 
-        self.main_frame.pack()
-        self.sub_main_frame.grid(row = 1, column =0, pady = 10)
-        self.bottom_frame.grid(row = 2, column = 0, pady = 5)
+        self.infotabview.add("Affichage")
+        self.infotabview.add("Fonctionnement")
+        self.infotabview.add("Thème")
 
+        self.bottom_frame = ct.CTkFrame(self)
+        self.bottom_frame.grid(row = 1, column = 0, pady = 5)
 
-        self.general_label = ct.CTkLabel(self.main_frame, text = "Générals", font=ct.CTkFont(size=25, weight="bold"))
-        self.color_theme_change_label = ct.CTkLabel(self.sub_main_frame, text = "Couleur", font=ct.CTkFont(size=15, weight="bold"))
-        self.color_theme_change_option = ct.CTkOptionMenu(self.sub_main_frame, values = ["Bleu foncé", "Bleu", "Vert"], variable=self.color)
-        self.color_theme_change_option.set(self.theme_translation["eng-fra"][self.parameters["color"]])
-
-        self.theme_change_label = ct.CTkLabel(self.sub_main_frame, text = "Thème", font=ct.CTkFont(size=15, weight="bold"))
-        self.theme_change_option = ct.CTkOptionMenu(self.sub_main_frame, values = ["Système", "Sombre", "Clair"], variable=self.theme)
-        self.theme_change_option.set(self.theme_translation["eng-fra"][self.parameters["theme"]])
-
-        
-        self.general_label.grid(row = 0, column = 0, pady = 10, columnspan = 2, sticky="w")
-
-        self.color_theme_change_label.grid(column =0, row = 0, pady =5, padx = 10)
-        self.color_theme_change_option.grid(row = 0, column = 1, pady =5, padx = 10)
-
-        self.theme_change_label.grid(row = 1, column = 0, pady = 5)
-        self.theme_change_option.grid(row = 1, column = 1, pady = 5)
 
         self.apply_button = ct.CTkButton(self.bottom_frame, text = "confirmer", font=ct.CTkFont(size=15, weight="bold") , command = lambda : self.applySettings())
-        self.return_button = ct.CTkButton(self.bottom_frame, text = "fermer", font=ct.CTkFont(size=15, weight="bold") , command = lambda : self.quitSettings())
-
+        self.return_button = ct.CTkButton(self.bottom_frame, text = "annuler", font=ct.CTkFont(size=15, weight="bold") , command = lambda : self.quitSettings())
 
         self.return_button.grid(row = 0, column = 0, padx = 10)
         self.apply_button.grid(row = 0, column =1)
+
+
+        #-------------------- Création de la fenêtre "Affichage" --------------------
+
+
+        #-------------------- Création de la fenêtre "Fonctionnement" --------------------
+
+
+        #-------------------- Création de la fenêtre "Thème" --------------------
+
+        self.Affichage_frame = ct.CTkFrame(self)
+
+        self.theme_label = ct.CTkLabel(self.infotabview.tab("Thème"), text = "Thème", font=ct.CTkFont(size=25, weight="bold"))
+
+        self.color_theme_change_label = ct.CTkLabel(self.infotabview.tab("Thème"), text = "Couleur", font=ct.CTkFont(size=15, weight="bold"))
+        self.color_theme_change_option = ct.CTkOptionMenu(self.infotabview.tab("Thème"), values = ["Bleu foncé", "Bleu", "Vert"], variable=self.color)
+        self.color_theme_change_option.set(self.theme_translation["eng-fra"][self.parameters["color"]])
+
+        self.theme_change_label = ct.CTkLabel(self.infotabview.tab("Thème"), text = "Thème", font=ct.CTkFont(size=15, weight="bold"))
+        self.theme_change_option = ct.CTkOptionMenu(self.infotabview.tab("Thème"), values = ["Système", "Sombre", "Clair"], variable=self.theme)
+        self.theme_change_option.set(self.theme_translation["eng-fra"][self.parameters["theme"]])
+
+        
+        self.theme_label.grid(row = 0, column = 0, pady = 10, columnspan = 2, sticky="w")
+
+        self.color_theme_change_label.grid(column =0, row = 1, pady =5, padx = 10)
+        self.color_theme_change_option.grid(row = 1, column = 1, pady =5, padx = 10)
+
+        self.theme_change_label.grid(row = 2, column = 0, pady = 5)
+        self.theme_change_option.grid(row = 2, column = 1, pady = 5)
 
 
     def quitSettings(self):
@@ -62,7 +74,7 @@ class AppEditing(ct.CTkToplevel):
     def applySettings(self):
         self.parameters["color"] = self.theme_translation["fra-eng"][self.color.get()]
         self.parameters["theme"] = self.theme_translation["fra-eng"][self.theme.get()] 
-        with open("window_parameters.json", "w") as file:
+        with open("wdSettings.json", "w") as file:
             json.dump(self.parameters, file)
         file.close()
         self.destroy()
@@ -71,3 +83,10 @@ class AppEditing(ct.CTkToplevel):
     def get(self):
         self.master.wait_window(self)
         return self.parameters
+    
+
+if __name__ == "__main__" :
+    with open ("wdSettings.json", "r") as file :
+        settings = json.load(file)
+    app = AppEditing(settings)
+    app.mainloop()

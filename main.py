@@ -83,10 +83,7 @@ class interface(ct.CTk):
         self.modify_button.place(x = self.width*(35/200), y = self.height*(3/200))
         self.parameter_button.place(x = self.width*(70/200), y = self.height*(3/200))
 
-        self.sideWidgetsUptdating()
-
-
-    #-------------------- création des fonctions --------------------    
+        self.sideWidgetsUptdating()   
 
 
     def openParameters(self):
@@ -102,7 +99,7 @@ class interface(ct.CTk):
 
 
     def getSettings(self):
-        with open("window_parameters.json", "r") as file :
+        with open("wdSettings.json", "r") as file :
             self.parameters = json.load(file)
         file.close()
         self.width = self.parameters["width"]
