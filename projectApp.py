@@ -126,14 +126,14 @@ class ProjectApp(ct.CTkToplevel):
         self.add_button = ct.CTkButton(self.side_frame, text = 'ajouter un projet', width = 160, height = 30, command = lambda : self.workFrameCreation())
         self.add_button.grid(padx = 10, pady = 5)
 
-        for projects in self.project_info.keys():
+        for projects in self.project_info:
             bt = ct.CTkButton(self.side_frame, text = projects, width = 160, height = 30, command = lambda : self.modifyFrame(projects))
             bt.grid(padx = 10, pady = 5)
 
 
     def addProject(self):
         self.newprojectname = self.entry.get()
-        self.project_info[self.newprojectname] = []
+        self.project_info.append(self.newprojectname)
         
         with open("projectInfoSave.json", "w") as file :
             json.dump(self.project_info, file)

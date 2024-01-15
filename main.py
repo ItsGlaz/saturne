@@ -1,5 +1,6 @@
 #fichier contenant l'interface graphique du programme
 import tkinter as tk
+from tkinter import messagebox
 import customtkinter as ct
 import json
 import tool_tip as tl
@@ -17,10 +18,14 @@ class interface(ct.CTk):
         self.settings = None
         self.widgetapp = None
         self.project_app = None
+        self.actual_widget = None
+        self.actual_sets = []
         self.getSettings()
 
 
         self.createInterface()
+        if self.actual_widget != None :
+            self.widgetParametersFrame(self.actual_widget)
 
 
     def createInterface(self) :
@@ -28,17 +33,17 @@ class interface(ct.CTk):
         #-------------------- création des frames --------------------
         
         
-        self.code_frame = ct.CTkFrame(self, width=self.width*(50/100), height=self.height, border_width=2, border_color="#000000")
-        self.edit_frame = ct.CTkFrame(self, width=self.width*(30/100), height=self.height*(90/100))
-        self.parameter_frame = ct.CTkFrame(self, height = self.height*(10/100), width = self.width*(50/100))
+        self.code_frame = ct.CTkFrame(self, width=self.width*(45/100), height=self.height, border_width=2, border_color="#000000")
+        self.edit_frame = ct.CTkScrollableFrame(self, width=self.width*(35/100), height=self.height*(90/100))
+        self.parameter_frame = ct.CTkFrame(self, height = self.height*(10/100), width = self.width*(55/100))
 
         self.main_item_frame = ct.CTkScrollableFrame(self, height = self.height*(85/100), width = self.width*(18/100), label_text = "widgets :")
 
 
         self.code_frame.grid(row =0, rowspan =2, column = 0)
-        self.edit_frame.grid(row = 0, column = 1)
+        self.edit_frame.grid(row = 0, column = 1, sticky = "e")
         
-        self.main_item_frame.grid(row = 0, column = 2)
+        self.main_item_frame.grid(row = 0, column = 2, sticky = "e")
         self.parameter_frame.grid(row = 1,column =1, columnspan = 2 )
 
 
@@ -53,6 +58,7 @@ class interface(ct.CTk):
         self.fichier.add_command(label = "nouveau projet", command = lambda x = "new" : self.openProjectApp(x))
         self.fichier.add_separator() 
         self.fichier.add_command(label = "enregistrer", command = lambda : None)
+        self.fichier.add_command(label='vérifier les fichiers', command = lambda : self.verifyFiles())
 
         self.menubar.add_cascade(label = "fichiers", menu = self.fichier)
         
@@ -104,8 +110,14 @@ class interface(ct.CTk):
             for element in liste :
                 element.destroy()
             self.createInterface()
+            if self.actual_widget != None :
+                self.widgetParametersFrame(self.actual_widget)
         if mod == 'itemFrame' :
             liste = self.main_item_frame.grid_slaves()
+            for element in liste :
+                element.destroy()
+        if mod == 'sets':
+            liste = self.edit_frame.grid_slaves()
             for element in liste :
                 element.destroy()
 
@@ -118,25 +130,72 @@ class interface(ct.CTk):
     def sideWidgetsUptdating(self):
         self.clear('itemFrame')
         
-        self.add_button = ct.CTkButton(self.main_item_frame, width= self.width*(16/100), height= 40, text = "Ajouter", 
+        self.add_button = ct.CTkButton(self.main_item_frame, width= self.width*(16/100), height= 40, text = "Ajouter",border_width= 2, border_color = "#FFFFFF",
                                        font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command= lambda : self.widgetAdding())
-        tl.CreateToolTip(self.add_button, text = "Bouton d'ajout de widgets dans le projet.")
+        tl.CreateToolTip(self.add_button, text = "Bouton d'ajout de widgets dans le projet.") if self.showtooltip == "Oui" else None
         self.add_button.grid(padx = 5, pady = 5)
 
         for widgets in self.widgets_list :
             w_bt = ct.CTkButton(self.main_item_frame, text = widgets, width= self.width*(16/100), height= self.height*(6/100), 
-                                font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda w_id : self.widgetParametersFrame(w_id))
+                                font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda w_id = widgets : self.widgetParametersFrame(w_id))
             w_bt.grid(padx = 5, pady = 5)
 
         
-    def widgetParametersFrame(self):
-        #crée la fenêtre des paramètres du widget selectionné
-        pass
+    def widgetParametersFrame(self, widget):
+        self.clear("sets")
+        self.actual_widget = widget
+        self.column_num = 1 if self.width*(30/100) < 400 else 3
+        row = 2
+        column = 0
+        try :
+            setsinfo = interl.getSetsInfoRqst()
+            widsets = interl.getWidSetsRqst(widget)
+        except setsinfo == None or widsets == None :
+            messagebox.showwarning("Fichier introuvable", "Une erreur est survenue lors du chargement des données.")
+        else : 
+            try :
+                self.overal_lbl = ct.CTkLabel(self.edit_frame, text = "",font=ct.CTkFont(size=25, weight="bold"))
+                self.widnamelbl = ct.CTkLabel(self.edit_frame, text = "Nom du widget :",font=ct.CTkFont(size=15, weight="bold"))
+                self.widname = ct.CTkEntry(self.edit_frame, width= 150, height = 40,font=ct.CTkFont(weight="bold"))
+
+                self.overal_lbl.grid(column = 0, row = 0, columnspan = 4, pady = 15)
+                self.widnamelbl.grid(row = 1, column = 0, columnspan = 2, pady = 20, sticky = 'e')
+                self.widname.grid(row = 1, column = 2, columnspan = 2, pady = 20)
+
+
+                #-------------------- création entrées de modification des paramètres --------------------
+
+
+                detail_dico = {"Simple" : (0,1), "Normal" : (1,2), "Complet" : (1,2,3)}
+                for parameter in widsets["parameters"]:
+                    if setsinfo[parameter][1] in detail_dico[self.detail_lvl] :
+                        
+                        lbl = ct.CTkLabel(self.edit_frame, text = parameter + " :", font=ct.CTkFont(size=15, weight="bold"))
+                        
+                        if parameter in ["font", "hover", "round_width_to_even_numbers", "round_height_to_even_numbers", "image"]:
+                            entry = ct.CTkCheckBox(self.edit_frame, text = "")
+                        elif parameter in ["state", "anchor", "compound", "justify"]:
+                            entry = ct.CTkOptionMenu(self.edit_frame, values = setsinfo[parameter][3])      
+                        else :
+                            entry = ct.CTkEntry(self.edit_frame, width = 130,font=ct.CTkFont(weight="bold"))
+                        self.actual_sets.append(entry)
+                        tl.CreateToolTip(lbl, setsinfo[parameter][2])
+
+                        lbl.grid(row = row, column = column, padx = 5, pady = 10, sticky = 'n')
+                        column = column + 1 if column < self.column_num else 0
+                        row += 1 if column == 0 else 0
+                        
+                        entry.grid(row = row, column = column, padx = 5, pady = 10, sticky = 'n')
+                        column = column + 1 if column < self.column_num else 0
+                        row += 1 if column == 0 else 0
+            
+            except any as error :
+                print(error)
+                messagebox.showwarning("Erreur de chargement", "Une erreur est survenue lors de l'affichage des données")
 
 
     def codeFrame(self):
-        #à voir si cette fonction est faite ou non
-        #permet d'afficher l'interface à construire, peut être remplacée par une fenêtre à part
+        #permet d'afficher le code de l'interface
         pass
 
 
@@ -177,6 +236,13 @@ class interface(ct.CTk):
             print("fenêtre d'ajout d'un widget déjà ouverte")
             self.widgetapp.focus()
 
+
+    def verifyFiles(self):
+        verify =interl.verifyFilesRqst()
+        if verify[0] != True :
+            messagebox.showwarning("Fichier manquant", f"Un fichier ou dossier est manquant \nname : {verify[0]}; class : {verify[1]}")
+        else :
+            messagebox.showinfo("Fichiers complets", "Tous les fichiers sont présents")
         
 
 if __name__ == "__main__":

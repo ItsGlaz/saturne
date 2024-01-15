@@ -77,7 +77,7 @@ class AppEditing(ct.CTkToplevel):
         self.fonc_lbl = ct.CTkLabel(self.infotabview.tab("Fonctionnement"), text = "Fonctionnement", font=ct.CTkFont(size= 25, weight="bold"))
 
         self.detail_lvl_lbl = ct.CTkLabel(self.infotabview.tab("Fonctionnement"), text = "Niveau de détail :", font=ct.CTkFont(size= 15, weight="bold"))
-        self.detail_lvl = ct.CTkOptionMenu(self.infotabview.tab("Fonctionnement"), values = ["Simplifié", "Normal", "Detaillé"])
+        self.detail_lvl = ct.CTkOptionMenu(self.infotabview.tab("Fonctionnement"), values = ["Simple", "Normal", "Complet"])
         self.detail_lvl.set(self.parameters["detail"])
 
 

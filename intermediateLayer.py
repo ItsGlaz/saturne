@@ -1,6 +1,7 @@
 #fichier gérant les interactions entre l'interface et les fichiers fonctionnels
 import fileOpening as fileop
 import fileManagemt as flmngt
+import json 
 from typing import *
 
 def newPrjctRqst(name : str): 
@@ -38,7 +39,24 @@ def modidyPrjctRqst(name : str, dico : dict):
 #                 return False
 
 
-def getPrjtSetRqst(name : str):
+def getPrjtSetRqst(name : str) -> dict:
     path = fileop.createPath(name)
     print(path)
-    return fileop.loadInfo(path, "json")
+    return fileop.loadInfo(path = path)
+
+
+def getWidSetsRqst(widget) -> dict:
+    return fileop.loadInfo(data = "widsets", widget = widget)
+
+def getSetsInfoRqst() -> dict:
+    return fileop.loadInfo(data = 'setsinfo')
+
+
+def verifyFilesRqst():
+    with open("projectInfoSave.json", 'r') as file :
+        prjts = json.load(file)
+    file.close()
+    for projects in prjts :
+        if not  fileop.verifyDir(fileop.createPath(projects)) :
+            return [projects, 'project']
+    return [fileop.verifyApp(), 'file']
