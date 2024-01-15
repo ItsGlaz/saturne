@@ -57,14 +57,10 @@ class ProjectApp(ct.CTkToplevel):
         self.inter_name_lbl = ct.CTkLabel(self.upper_frame, text = "nom de l'interface :", width = 180)
         self.inter_height_lbl = ct.CTkLabel(self.upper_frame, text = "hauteur :", width = 90)
         self.inter_width_lbl = ct.CTkLabel(self.upper_frame, text = "largeur :", width = 90)
-        self.minheight_lbl = ct.CTkLabel(self.upper_frame, text = "hauteur minimale :", width = 90)
-        self.minwidth_lbl = ct.CTkLabel(self.upper_frame, text = "largeur minimale :", width = 90)
 
-        self.inter_name_lbl.grid(row = 1, column =0, padx = 10, pady = 10)
+        self.inter_name_lbl.grid(row = 0, column =0, padx = 10, pady = 10)
         self.inter_height_lbl.grid(row = 0, column =1, padx = 5, pady = 10)
         self.inter_width_lbl.grid(row = 1, column =1, padx = 5, pady = 10)
-        self.minheight_lbl.grid(row = 2, column =1, padx = 5, pady = 10)
-        self.minwidth_lbl.grid(row = 3, column =1, padx = 5, pady = 10)
 
 
         #-------------------- création des entrées -------------------- 
@@ -79,18 +75,10 @@ class ProjectApp(ct.CTkToplevel):
         self.interface_width = ct.CTkEntry(self.upper_frame, width=90)
         self.interface_width.insert(0, dico["width"] if dico != None else "")
 
-        self.min_height = ct.CTkEntry(self.upper_frame, width=90) 
-        self.min_height.insert(0, dico["minHeight"] if dico != None else "")
 
-        self.min_width = ct.CTkEntry(self.upper_frame, width=90)
-        self.min_width.insert(0, dico["minWidth"] if dico != None else "")
-
-
-        self.interface_name.grid(row = 2, column = 0, padx = 10)
+        self.interface_name.grid(row = 1, column = 0, padx = 10)
         self.interface_height.grid(row = 0, column =2, padx = 5)
         self.interface_width.grid(row = 1, column =2, padx = 5, pady = 10)
-        self.min_height.grid(row = 2, column =2, padx = 5, pady = 10)
-        self.min_width.grid(row = 3, column =2, padx = 5)
 
 
         #-------------------- création des boutons -------------------- 
@@ -118,8 +106,6 @@ class ProjectApp(ct.CTkToplevel):
             dico["Name"]        = self.interface_name.get()
             dico["height"]      = int(self.interface_height.get())
             dico["width"]       = int(self.interface_width.get())
-            dico["minHeight"]   = int(self.min_height.get())
-            dico["minWidth"]    = int(self.min_width.get())
             interl.modidyPrjctRqst(self.actual_prjt, dico)
         except :
             self.errorMsg("wrongType")

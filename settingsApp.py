@@ -7,6 +7,7 @@ from typing import Optional, Tuple, Union
 from copy import deepcopy
 import customtkinter as ct 
 import json
+from tkinter import messagebox
 
 class AppEditing(ct.CTkToplevel):
 
@@ -18,6 +19,7 @@ class AppEditing(ct.CTkToplevel):
         self.theme = ct.StringVar()
         self.theme_translation = {"eng-fra" : {"green" : "Vert", "dark-blue" : "Bleu foncé", "blue" : "Bleu", "system" : "Système", "dark" : "Sombre", "light" : "Clair"}, 
                                   "fra-eng" : {"Vert" : "green", "Bleu" : "blue", "Bleu foncé" : "dark-blue", "Système" : "system", "Sombre" : "dark", "Clair" : "light"}}
+        
 
         self.infotabview = ct.CTkTabview(self)
         self.infotabview.grid(padx=10, pady=10, sticky="wsen")
@@ -40,7 +42,49 @@ class AppEditing(ct.CTkToplevel):
         #-------------------- Création de la fenêtre "Affichage" --------------------
 
 
+        self.affichage_lbl = ct.CTkLabel(self.infotabview.tab("Affichage"), text = "Affichage", font=ct.CTkFont(size= 25, weight="bold"))
+
+        self.sub_res_frame = ct.CTkFrame(self.infotabview.tab("Affichage"))
+
+        self.screen_res_lbl = ct.CTkLabel(self.sub_res_frame, text = "Résolution :", font=ct.CTkFont(size=15, weight="bold"))
+        self.pixel_ind_lbl = ct.CTkLabel(self.sub_res_frame, text = "x", font=ct.CTkFont(size=15, weight="bold"))
+        self.screen_width = ct.CTkEntry(self.sub_res_frame, width =60)
+        self.screen_height = ct.CTkEntry(self.sub_res_frame, width =60)
+        
+        self.screen_width.insert(0, self.parameters["width"])
+        self.screen_height.insert(0, self.parameters["height"])
+
+        self.get_tooltip_lbl = ct.CTkLabel(self.infotabview.tab("Affichage"), text = "Afficher les tooltip :", font=ct.CTkFont(size=15, weight="bold"))
+        self.get_tooltip = ct.CTkSegmentedButton(self.infotabview.tab("Affichage"), values = ["Oui", "Non"])
+        self.get_tooltip.set(self.parameters["tooltip"])
+
+
+        self.affichage_lbl.grid(row = 0, column =0, columnspan = 2, pady = 10, sticky = 'w')
+        self.sub_res_frame.grid(row = 0, column =0, columnspan = 2, pady = 10, sticky = 'w')
+
+        self.screen_res_lbl.grid(row = 1, column = 0, padx = 10, pady = 10, sticky = 'w')
+        self.screen_width.grid(row = 1, column = 1, padx = 5, pady = 10)
+        self.pixel_ind_lbl.grid(row = 1, column = 2, pady = 10, sticky = 'w')
+        self.screen_height.grid(row = 1, column = 3, padx = 5, pady = 10)
+
+        self.get_tooltip_lbl.grid(row = 2, column = 0, padx = 10, pady = 10, sticky = 'w')
+        self.get_tooltip.grid(row = 2, column = 1, padx = 10, pady = 10, ipadx = 20)
+
+
         #-------------------- Création de la fenêtre "Fonctionnement" --------------------
+
+
+        self.fonc_lbl = ct.CTkLabel(self.infotabview.tab("Fonctionnement"), text = "Fonctionnement", font=ct.CTkFont(size= 25, weight="bold"))
+
+        self.detail_lvl_lbl = ct.CTkLabel(self.infotabview.tab("Fonctionnement"), text = "Niveau de détail :", font=ct.CTkFont(size= 15, weight="bold"))
+        self.detail_lvl = ct.CTkOptionMenu(self.infotabview.tab("Fonctionnement"), values = ["Simplifié", "Normal", "Detaillé"])
+        self.detail_lvl.set(self.parameters["detail"])
+
+
+        self.fonc_lbl.grid(row = 0, column =0, columnspan = 2, pady = 10, sticky = 'w')
+
+        self.detail_lvl_lbl.grid(row = 1, column = 0, padx = 10, pady = 10, sticky = 'w')
+        self.detail_lvl.grid(row = 1, column = 1, padx = 10, pady = 10)
 
 
         #-------------------- Création de la fenêtre "Thème" --------------------
@@ -49,11 +93,11 @@ class AppEditing(ct.CTkToplevel):
 
         self.theme_label = ct.CTkLabel(self.infotabview.tab("Thème"), text = "Thème", font=ct.CTkFont(size=25, weight="bold"))
 
-        self.color_theme_change_label = ct.CTkLabel(self.infotabview.tab("Thème"), text = "Couleur", font=ct.CTkFont(size=15, weight="bold"))
+        self.color_theme_change_label = ct.CTkLabel(self.infotabview.tab("Thème"), text = "Couleur :", font=ct.CTkFont(size=15, weight="bold"))
         self.color_theme_change_option = ct.CTkOptionMenu(self.infotabview.tab("Thème"), values = ["Bleu foncé", "Bleu", "Vert"], variable=self.color)
         self.color_theme_change_option.set(self.theme_translation["eng-fra"][self.parameters["color"]])
 
-        self.theme_change_label = ct.CTkLabel(self.infotabview.tab("Thème"), text = "Thème", font=ct.CTkFont(size=15, weight="bold"))
+        self.theme_change_label = ct.CTkLabel(self.infotabview.tab("Thème"), text = "Thème :", font=ct.CTkFont(size=15, weight="bold"))
         self.theme_change_option = ct.CTkOptionMenu(self.infotabview.tab("Thème"), values = ["Système", "Sombre", "Clair"], variable=self.theme)
         self.theme_change_option.set(self.theme_translation["eng-fra"][self.parameters["theme"]])
 
@@ -67,17 +111,29 @@ class AppEditing(ct.CTkToplevel):
         self.theme_change_option.grid(row = 2, column = 1, pady = 5)
 
 
+    #-------------------- Création des fonctions --------------------
+
+
     def quitSettings(self):
-        self.destroy()
+        on_quit = messagebox.askyesno("Qitter les paramètres", "Voulez-vous quitter les paramètres ?\n(les modifications ne seront pas enregistrées).")
+        if on_quit :
+            self.destroy()
 
 
     def applySettings(self):
-        self.parameters["color"] = self.theme_translation["fra-eng"][self.color.get()]
-        self.parameters["theme"] = self.theme_translation["fra-eng"][self.theme.get()] 
-        with open("wdSettings.json", "w") as file:
-            json.dump(self.parameters, file)
-        file.close()
-        self.destroy()
+        try :
+            self.parameters["width"] = int(self.screen_width.get())
+            self.parameters["height"] = int(self.screen_height.get())
+            self.parameters["tooltip"]     = self.get_tooltip.get()
+            self.parameters["detail"]      = self.detail_lvl.get()
+            self.parameters["color"]       = self.theme_translation["fra-eng"][self.color.get()]
+            self.parameters["theme"]       = self.theme_translation["fra-eng"][self.theme.get()] 
+            with open("wdSettings.json", "w") as file:
+                json.dump(self.parameters, file)
+            file.close()
+            self.destroy()
+        except :
+            messagebox.showerror("Erreur de sauvergarde", "Une erreur est survenue lors de la sauvergarde des données,\nvérifiez les paramètres entrés.")
 
 
     def get(self):

@@ -65,8 +65,11 @@ def rmFile(path : str):
 def loadInfo(path : str, datatype : str):
     if datatype == 'json' : 
         if verifyDir(path = path) :
-            with open(path +"\\"+ 'prjtset.json', "r") as file:
-                return json.load(file)
+            try : 
+                with open(path +"\\"+ 'prjtset.json', "r") as file:
+                    return json.load(file)
+            except :
+                return None
             
 
 def writeInfo(path : str, info: Union[dict, str], type : str):

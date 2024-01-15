@@ -1,5 +1,4 @@
 #fichier contenant l'interface graphique du programme
-#ajouter une barre de menu pour :
 import tkinter as tk
 import customtkinter as ct
 import json
@@ -28,23 +27,18 @@ class interface(ct.CTk):
         
         #-------------------- création des frames --------------------
         
-        self.main_frame = ct.CTkFrame(self)
         
-        self.show_frame = ct.CTkFrame(self.main_frame, width=self.width*(50/100), height=self.height, border_width=2, border_color="#000000")
-        self.edit_frame = ct.CTkFrame(self.main_frame, width=self.width*(30/100), height=self.height*(90/100))
-        self.item_frame = ct.CTkFrame(self.main_frame, width=self.width*(20/100), height=self.height*(90/100), border_width=2, border_color="#000000")
-        self.parameter_frame = ct.CTkFrame(self.main_frame, height = self.height*(10/100), width = self.width*(50/100))
+        self.code_frame = ct.CTkFrame(self, width=self.width*(50/100), height=self.height, border_width=2, border_color="#000000")
+        self.edit_frame = ct.CTkFrame(self, width=self.width*(30/100), height=self.height*(90/100))
+        self.parameter_frame = ct.CTkFrame(self, height = self.height*(10/100), width = self.width*(50/100))
 
-        self.main_item_frame = ct.CTkScrollableFrame(self.item_frame, height = self.height*(90/100))
+        self.main_item_frame = ct.CTkScrollableFrame(self, height = self.height*(85/100), width = self.width*(18/100), label_text = "widgets :")
 
 
-        self.main_frame.grid()
-
-        self.show_frame.grid(rowspan = 2, column = 0)
+        self.code_frame.grid(row =0, rowspan =2, column = 0)
         self.edit_frame.grid(row = 0, column = 1)
-        self.item_frame.grid(row = 0, column = 2)
         
-        self.main_item_frame.grid()
+        self.main_item_frame.grid(row = 0, column = 2)
         self.parameter_frame.grid(row = 1,column =1, columnspan = 2 )
 
 
@@ -66,17 +60,17 @@ class interface(ct.CTk):
         #-------------------- création des widgets des paramètres --------------------
 
 
-        self.parameter_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100), bg_color= 'transparent',
+        self.parameter_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100),
                                              text = "paramètres", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : self.openParameters())
-        tl.CreateToolTip(self.parameter_button, text = "Bouton d'ouverture de la fenêtre de paramètres.")
+        tl.CreateToolTip(self.parameter_button, text = "Bouton d'ouverture de la fenêtre de paramètres.") if self.showtooltip == "Oui" else None
 
-        self.modify_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100), bg_color= 'transparent',
-                                             text = "modifier", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : None)#modifier ici la fonction
-        tl.CreateToolTip(self.modify_button, text = "Bouton de modification des paramètres d'un widget.")
+        self.modify_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100),
+                                             text = "modifier", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : None)
+        tl.CreateToolTip(self.modify_button, text = "Bouton de modification des paramètres d'un widget.") if self.showtooltip == "Oui" else None
 
-        self.delete_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100), bg_color= 'transparent',
+        self.delete_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100),
                                              text = "supprimer", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10)
-        tl.CreateToolTip(self.delete_button, text = "Bouton de suppression d'un widget.")
+        tl.CreateToolTip(self.delete_button, text = "Bouton de suppression d'un widget.") if self.showtooltip == "Oui" else None
 
         
         self.delete_button.place(x = self.width*(5/200), y = self.height*(3/200))
@@ -86,28 +80,21 @@ class interface(ct.CTk):
         self.sideWidgetsUptdating()   
 
 
-    def openParameters(self):
-        if self.settings == None :
-            self.settings = AppEditing(self.parameters)
-            self.parameters = self.settings.get()
-            self.settings = None
-            self.getSettings()
-            self.clear('all')
-        else :
-            print("fenêtre de paramètres déjà ouverte")
-            self.settings.focus()
-
-
     def getSettings(self):
+
         with open("wdSettings.json", "r") as file :
             self.parameters = json.load(file)
         file.close()
-        self.width = self.parameters["width"]
-        self.height = self.parameters["height"]
+
+        self.width       = self.parameters["width"]
+        self.height      = self.parameters["height"]
+        self.showtooltip = self.parameters["tooltip"]
+        self.detail_lvl  = self.parameters["detail"]
+
         ct.set_default_color_theme(self.parameters["color"])
         ct.set_appearance_mode(self.parameters["theme"])
         
-        self.geometry(f"{str(self.width)}x{str(self.height)}")
+        self.geometry("500x300")
         self.minsize(self.width, self.height)
 
 
@@ -131,21 +118,56 @@ class interface(ct.CTk):
     def sideWidgetsUptdating(self):
         self.clear('itemFrame')
         
-        self.add_button = ct.CTkButton(self.main_item_frame, width= self.width*(18/100), height= self.height*(6/100), text = "ajouter", 
+        self.add_button = ct.CTkButton(self.main_item_frame, width= self.width*(16/100), height= 40, text = "Ajouter", 
                                        font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command= lambda : self.widgetAdding())
         tl.CreateToolTip(self.add_button, text = "Bouton d'ajout de widgets dans le projet.")
         self.add_button.grid(padx = 5, pady = 5)
 
         for widgets in self.widgets_list :
-            w_bt = ct.CTkButton(self.main_item_frame, text = widgets, width= self.width*(18/100), height= self.height*(6/100), 
+            w_bt = ct.CTkButton(self.main_item_frame, text = widgets, width= self.width*(16/100), height= self.height*(6/100), 
                                 font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda w_id : self.widgetParametersFrame(w_id))
             w_bt.grid(padx = 5, pady = 5)
+
+        
+    def widgetParametersFrame(self):
+        #crée la fenêtre des paramètres du widget selectionné
+        pass
+
+
+    def codeFrame(self):
+        #à voir si cette fonction est faite ou non
+        #permet d'afficher l'interface à construire, peut être remplacée par une fenêtre à part
+        pass
+
+
+    def openProjectApp(self, mod = None):
+        if self.project_app == None :
+            self.project_app = ProjectApp(mod)
+            self.project_app.grab_set()
+            self.project_app.closed()
+            self.project_app = None
+        else :
+            print("fenêtre de projets déjà ouverte")
+            self.project_app.focus()
+
+
+    def openParameters(self):
+        if self.settings == None :
+            self.settings = AppEditing(self.parameters)
+            self.settings.grab_set()
+            self.parameters = self.settings.get()
+            self.settings = None
+            self.getSettings()
+            self.clear('all')
+        else :
+            print("fenêtre de paramètres déjà ouverte")
+            self.settings.focus()
 
 
     def widgetAdding(self):
         if self.widgetapp == None :
             self.widgetapp = WidgetApp()
-            self.widgetapp.focus()
+            self.widgetapp.grab_set()
             newwidget = self.widgetapp.get()
             if newwidget != None :
                 self.widgets_list.append(newwidget)
@@ -154,29 +176,6 @@ class interface(ct.CTk):
         else :
             print("fenêtre d'ajout d'un widget déjà ouverte")
             self.widgetapp.focus()
-
-        
-    def widgetParametersFrame(self):
-        #crée la fenêtre des paramètres du widget selectionné
-        pass
-
-
-    def previewFrame(self):
-        #à voir si cette fonction est faite ou non
-        #permet d'afficher l'interface à construire, peut être remplacée par une fenêtre à part
-        pass
-
-
-    def openProjectApp(self, mod = None):
-        print("1",self.project_app)
-        if self.project_app == None :
-            self.project_app = ProjectApp(mod)
-            self.project_app.closed()
-            self.project_app = None
-            print("2",self.project_app)
-        else :
-            print("fenêtre de projets déjà ouverte")
-            #self.project_app.focus()
 
         
 
