@@ -20,7 +20,7 @@ class ProjectApp(ct.CTkToplevel):
         self.actual_prjt = None
         
         self.sideFrameUpdating()
-        if mod == "new" : self.workFrameCreation()
+        self.workFrameCreation()
 
 
     def workFrameCreation(self):
@@ -36,7 +36,8 @@ class ProjectApp(ct.CTkToplevel):
 
 
     def modifyFrame(self, project):
-        
+        self.clear("workFrame")
+
         self.actual_prjt = project
         dico = self.loadPrjctInfo()
 
@@ -86,7 +87,7 @@ class ProjectApp(ct.CTkToplevel):
 
         self.del_bt = ct.CTkButton(self.lower_frame, text = "supprimer", height = 30, width=130, command = lambda : self.delProject(project))
         self.modify_bt = ct.CTkButton(self.lower_frame, text = "modifier", height = 30, width=130, command = lambda :self.modifyInfo())
-        self.open_bt = ct.CTkButton(self.lower_frame, text = "ouvrir", height = 30, width=130, command = lambda : None)
+        self.open_bt = ct.CTkButton(self.lower_frame, text = "ouvrir", height = 30, width=130, command = lambda : self.destroy())
 
         self.del_bt.grid(row = 0, column = 0, padx = 10, pady = 10)
         self.modify_bt.grid(row = 0, column = 1, padx = 10, pady = 10)
@@ -108,17 +109,14 @@ class ProjectApp(ct.CTkToplevel):
             dico["width"]       = int(self.interface_width.get())
             interl.modidyPrjctRqst(self.actual_prjt, dico)
         except :
-            self.errorMsg("wrongType")
+            messagebox.showerror('entrées invalides', "données entrées ivalides")
 
     
     def openProjectInfo(self):
-        with open("projectInfoSave.json", "r") as file :
-            self.project_info = json.load(file)
+        with open("rssDir\prjctNameSave.txt", "r") as file :
+            self.project_info = file.read().split(",")
         file.close()
 
-
-    def errorMsg(self, origin):
-        messagebox.showerror('entrées invalides', "données entrées ivalides")
 
     def sideFrameUpdating(self):
         self.openProjectInfo()
@@ -127,16 +125,19 @@ class ProjectApp(ct.CTkToplevel):
         self.add_button.grid(padx = 10, pady = 5)
 
         for projects in self.project_info:
-            bt = ct.CTkButton(self.side_frame, text = projects, width = 160, height = 30, command = lambda : self.modifyFrame(projects))
-            bt.grid(padx = 10, pady = 5)
+            if projects != "":
+                bt = ct.CTkButton(self.side_frame, text = projects, width = 160, height = 30, command = lambda : self.modifyFrame(projects))
+                bt.grid(padx = 10, pady = 5)
 
 
     def addProject(self):
         self.newprojectname = self.entry.get()
         self.project_info.append(self.newprojectname)
+        converted_info = ",".join(self.project_info)
+
         
-        with open("projectInfoSave.json", "w") as file :
-            json.dump(self.project_info, file)
+        with open("rssDir\prjctNameSave.txt", "w") as file :
+            file.write(converted_info)
         file.close()
         
         if self.newprojectname != None and type(self.newprojectname) == str :
@@ -149,16 +150,20 @@ class ProjectApp(ct.CTkToplevel):
 
 
     def delProject(self, project):
-        del self.project_info[project]
-        with open("projectInfoSave.json", "w") as file :
-            json.dump(self.project_info, file)
-        file.close()
-        if type(project) == str :
-            interl.rmproject(project)
-        
-        self.clear("workFrame")
-        self.clear("sideFrame")
-        self.sideFrameUpdating()
+        try : 
+            if type(project) == str :
+                interl.rmproject(project)
+            del self.project_info[self.project_info.index(project)]
+            converted_info = ",".join(self.project_info)
+            with open("rssDir\prjctNameSave.txt", "w") as file :
+                file.write(converted_info)
+            file.close()
+            
+            self.clear("workFrame")
+            self.clear("sideFrame")
+            self.sideFrameUpdating()
+        except :
+            messagebox.showerror("Suppression impossible", "Une erreur est survenue lors de la suppresion du projet.")
 
 
     def clear(self, choice):
@@ -172,7 +177,7 @@ class ProjectApp(ct.CTkToplevel):
 
     def closed(self):
         self.master.wait_window(self)
-        return None
+        return self.actual_prjt
         
 
 if __name__ == "__main__" :

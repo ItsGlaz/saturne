@@ -19,7 +19,9 @@ class interface(ct.CTk):
         self.widgetapp = None
         self.project_app = None
         self.actual_widget = None
+        self.line = None
         self.actual_sets = []
+        self.widlist = {}
         self.getSettings()
 
 
@@ -71,7 +73,7 @@ class interface(ct.CTk):
         tl.CreateToolTip(self.parameter_button, text = "Bouton d'ouverture de la fenêtre de paramètres.") if self.showtooltip == "Oui" else None
 
         self.modify_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100),
-                                             text = "modifier", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : None)
+                                             text = "modifier", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : self.modifyWid())
         tl.CreateToolTip(self.modify_button, text = "Bouton de modification des paramètres d'un widget.") if self.showtooltip == "Oui" else None
 
         self.delete_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100),
@@ -88,7 +90,7 @@ class interface(ct.CTk):
 
     def getSettings(self):
 
-        with open("wdSettings.json", "r") as file :
+        with open("rssDir\wdSettings.json", "r") as file :
             self.parameters = json.load(file)
         file.close()
 
@@ -100,6 +102,7 @@ class interface(ct.CTk):
         ct.set_default_color_theme(self.parameters["color"])
         ct.set_appearance_mode(self.parameters["theme"])
         
+        self.title("Saturne")
         self.geometry("500x300")
         self.minsize(self.width, self.height)
 
@@ -122,9 +125,12 @@ class interface(ct.CTk):
                 element.destroy()
 
 
-    def fileLoading(self):
+    def prjctInfoLoading(self, event):
         #fonction d'envoi d'une requête au programme de gestion des fichiers
-        pass
+        match event :
+            case "widnamelist":
+                pass
+        return interl.getWidListRqst(self.actual_project)
 
 
     def sideWidgetsUptdating(self):
@@ -134,11 +140,28 @@ class interface(ct.CTk):
                                        font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command= lambda : self.widgetAdding())
         tl.CreateToolTip(self.add_button, text = "Bouton d'ajout de widgets dans le projet.") if self.showtooltip == "Oui" else None
         self.add_button.grid(padx = 5, pady = 5)
-
         for widgets in self.widgets_list :
             w_bt = ct.CTkButton(self.main_item_frame, text = widgets, width= self.width*(16/100), height= self.height*(6/100), 
                                 font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda w_id = widgets : self.widgetParametersFrame(w_id))
             w_bt.grid(padx = 5, pady = 5)
+
+
+    def modifyWid(self):
+        dico = {}
+        print(self.widlist)
+        for entries in self.actual_sets :
+            try :
+                dico[entries[1]] = entries[0].get()
+            except :
+                dico[entries[1]] = None
+        try : 
+            self.widlist.insert(self.line, dico)
+            del self.widlist[self.line + 1]
+        except :
+            try: self.widlist.append(dico)
+            except : messagebox.showwarning("Erreur de modification", "Une erreur est survenue lors de la sauvegarde des modifications.")
+        print(self.widlist)
+        #ajouter les modification dans le fichier du projet
 
         
     def widgetParametersFrame(self, widget):
@@ -147,40 +170,44 @@ class interface(ct.CTk):
         self.column_num = 1 if self.width*(30/100) < 400 else 3
         row = 2
         column = 0
+        loading = True
         try :
-            setsinfo = interl.getSetsInfoRqst()
+            self.widlist = self.prjctInfoLoading()
             widsets = interl.getWidSetsRqst(widget)
-        except setsinfo == None or widsets == None :
-            messagebox.showwarning("Fichier introuvable", "Une erreur est survenue lors du chargement des données.")
-        else : 
+            setsinfo = interl.getSetsInfoRqst()
+        except :
             try :
-                self.overal_lbl = ct.CTkLabel(self.edit_frame, text = "",font=ct.CTkFont(size=25, weight="bold"))
-                self.widnamelbl = ct.CTkLabel(self.edit_frame, text = "Nom du widget :",font=ct.CTkFont(size=15, weight="bold"))
-                self.widname = ct.CTkEntry(self.edit_frame, width= 150, height = 40,font=ct.CTkFont(weight="bold"))
+                setsinfo = interl.getSetsInfoRqst()
+                widsets = interl.getWidSetsRqst(widget)
+            except setsinfo == None or widsets == None :
+                loading = False
+                messagebox.showwarning("Fichier introuvable", "Une erreur est survenue lors du chargement des données.")
+        print(len(self.widlist), loading)
+        
+        self.overal_lbl = ct.CTkLabel(self.edit_frame, text = "",font=ct.CTkFont(size=25, weight="bold"))
+        self.widnamelbl = ct.CTkLabel(self.edit_frame, text = "Nom du widget :",font=ct.CTkFont(size=15, weight="bold"))
+        self.widname = ct.CTkEntry(self.edit_frame, width= 150, height = 40,font=ct.CTkFont(weight="bold"))
 
-                self.overal_lbl.grid(column = 0, row = 0, columnspan = 4, pady = 15)
-                self.widnamelbl.grid(row = 1, column = 0, columnspan = 2, pady = 20, sticky = 'e')
-                self.widname.grid(row = 1, column = 2, columnspan = 2, pady = 20)
-
-
+        self.overal_lbl.grid(column = 0, row = 0, columnspan = 4, pady = 15)
+        self.widnamelbl.grid(row = 1, column = 0, columnspan = 2, pady = 20, sticky = 'e')
+        self.widname.grid(row = 1, column = 2, columnspan = 2, pady = 20)
+        detail_dico = {"Simple" : (0,1), "Normal" : (1,2), "Complet" : (1,2,3)}
+        if loading == True and len(self.widlist) < 1 : 
+            try :
                 #-------------------- création entrées de modification des paramètres --------------------
 
-
-                detail_dico = {"Simple" : (0,1), "Normal" : (1,2), "Complet" : (1,2,3)}
                 for parameter in widsets["parameters"]:
                     if setsinfo[parameter][1] in detail_dico[self.detail_lvl] :
                         
                         lbl = ct.CTkLabel(self.edit_frame, text = parameter + " :", font=ct.CTkFont(size=15, weight="bold"))
-                        
                         if parameter in ["font", "hover", "round_width_to_even_numbers", "round_height_to_even_numbers", "image"]:
                             entry = ct.CTkCheckBox(self.edit_frame, text = "")
                         elif parameter in ["state", "anchor", "compound", "justify"]:
                             entry = ct.CTkOptionMenu(self.edit_frame, values = setsinfo[parameter][3])      
                         else :
                             entry = ct.CTkEntry(self.edit_frame, width = 130,font=ct.CTkFont(weight="bold"))
-                        self.actual_sets.append(entry)
+                        self.actual_sets.append((entry, parameter))
                         tl.CreateToolTip(lbl, setsinfo[parameter][2])
-
                         lbl.grid(row = row, column = column, padx = 5, pady = 10, sticky = 'n')
                         column = column + 1 if column < self.column_num else 0
                         row += 1 if column == 0 else 0
@@ -188,7 +215,35 @@ class interface(ct.CTk):
                         entry.grid(row = row, column = column, padx = 5, pady = 10, sticky = 'n')
                         column = column + 1 if column < self.column_num else 0
                         row += 1 if column == 0 else 0
-            
+            except any as error :
+                print(error)
+                messagebox.showwarning("Erreur de chargement", "Une erreur est survenue lors de l'affichage des données")
+        elif loading == True and self.widlist != {}:
+            try :    
+                for element in self.widlist :
+                    if element["name"] == widget :
+                        self.line = self.widlist.index(element)
+                        for parameter in widsets["parameters"]:
+                            if setsinfo[parameter][1] in detail_dico[self.detail_lvl] :
+                                
+                                lbl = ct.CTkLabel(self.edit_frame, text = parameter + " :", font=ct.CTkFont(size=15, weight="bold"))
+                                
+                                if parameter in ["font", "hover", "round_width_to_even_numbers", "round_height_to_even_numbers", "image"]:
+                                    entry = ct.CTkCheckBox(self.edit_frame, text = "")
+                                elif parameter in ["state", "anchor", "compound", "justify"]:
+                                    entry = ct.CTkOptionMenu(self.edit_frame, values = setsinfo[parameter][3])      
+                                else :
+                                    entry = ct.CTkEntry(self.edit_frame, width = 130,font=ct.CTkFont(weight="bold"))
+                                    entry.insert(0, element[parameter])
+                                self.actual_sets.append((entry, parameter))
+                                tl.CreateToolTip(lbl, setsinfo[parameter][2])
+                                lbl.grid(row = row, column = column, padx = 5, pady = 10, sticky = 'n')
+                                column = column + 1 if column < self.column_num else 0
+                                row += 1 if column == 0 else 0
+                        
+                                entry.grid(row = row, column = column, padx = 5, pady = 10, sticky = 'n')
+                                column = column + 1 if column < self.column_num else 0
+                                row += 1 if column == 0 else 0
             except any as error :
                 print(error)
                 messagebox.showwarning("Erreur de chargement", "Une erreur est survenue lors de l'affichage des données")
@@ -203,8 +258,13 @@ class interface(ct.CTk):
         if self.project_app == None :
             self.project_app = ProjectApp(mod)
             self.project_app.grab_set()
-            self.project_app.closed()
+            self.actual_project = self.project_app.closed()
             self.project_app = None
+            if self.actual_project != None :
+                self.title(f"Saturne : {self.actual_project}")
+            else :
+                self.title("Saturne")
+                self.prjctInfoLoading(event = "widnamelist")
         else :
             print("fenêtre de projets déjà ouverte")
             self.project_app.focus()

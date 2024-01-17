@@ -9,7 +9,7 @@ class AddWidgetTool(ct.CTk):
     def __init__(self, fg_color: str | Tuple[str, str] | None = None, **kwargs):
         super().__init__(fg_color, **kwargs)
 
-        with open("WidParaInfo.json", "r",) as file :
+        with open("rssDir\WidParaInfo.json", "r",) as file :
             self.validparameters = json.load(file)
             file.close()
         self.entries = [] 
@@ -57,7 +57,7 @@ class AddWidgetTool(ct.CTk):
 
 
     def readFile(self):
-        with open("widgetInfo.json", "r") as file :
+        with open("rssDir\widgetInfo.json", "r") as file :
             self.widget_info = json.load(file)
         file.close()
 
@@ -67,10 +67,10 @@ class AddWidgetTool(ct.CTk):
         dico["name"]        = self.entry_name.get()
         dico["id"]          = self.entry_id.get()
 
-        with open("widgetRss.json", "r") as file :
+        with open("rssDir\widgetRss.json", "r") as file :
             info = json.load(file)
             info.append(dico)
-        with open("widgetRss.json", "w") as file :
+        with open("rssDir\widgetRss.json", "w") as file :
             json.dump(info, file)
         file.close()
 
@@ -80,7 +80,7 @@ class AddWidgetTool(ct.CTk):
         self.clear()
         self.frameCreation()
         
-        with open("widgetInfo.json", "w") as file :
+        with open("rssDir\widgetInfo.json", "w") as file :
             json.dump(self.widget_info, file)
         file.close()
 

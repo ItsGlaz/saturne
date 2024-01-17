@@ -27,7 +27,7 @@ class WidgetApp(ct.CTkToplevel):
 
 
     def getWidget(self):
-        with open("widgetRss.json", "r") as file :
+        with open("rssDir\widgetRss.json", "r") as file :
             self.widgets_list = json.load(file)
         file.close()
 

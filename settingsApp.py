@@ -128,7 +128,7 @@ class AppEditing(ct.CTkToplevel):
             self.parameters["detail"]      = self.detail_lvl.get()
             self.parameters["color"]       = self.theme_translation["fra-eng"][self.color.get()]
             self.parameters["theme"]       = self.theme_translation["fra-eng"][self.theme.get()] 
-            with open("wdSettings.json", "w") as file:
+            with open("rssDir\wdSettings.json", "w") as file:
                 json.dump(self.parameters, file)
             file.close()
             self.destroy()

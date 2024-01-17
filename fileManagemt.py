@@ -4,3 +4,6 @@ import fileOpening as fileop
 def modifyPrjtInfo(name : str, newinfo : dict):
     get_path = fileop.createPath(name) +"\\"+ 'prjtset.json'
     fileop.writeInfo(get_path, newinfo, "json")
+
+def modifyWidInfo(dict):
+    pass
