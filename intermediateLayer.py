@@ -53,19 +53,13 @@ def getSetsInfoRqst() -> dict:
 
 
 def verifyFilesRqst()-> list:
-    with open("projectInfoSave.json", 'r') as file :
-        prjts = json.load(file)
+    path = fileop.createPath("rssDir")
+    with open(path + "\\" + "prjctNameSave.txt", 'r') as file :
+        prjts = file.read()
+        prjts.split(",")
     file.close()
     for projects in prjts :
+        print(projects)
         if not  fileop.verifyDir(fileop.createPath(projects)) :
             return [projects, 'project']
     return [fileop.verifyApp(), 'file']
-
-
-def getWidListRqst(prjct):
-    path = fileop.createPath(prjct)
-    return fileop.loadInfo(path, data = "widlist")
-
-
-def writeWidInfoReq(data : dict):
-    pass

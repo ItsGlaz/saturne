@@ -1,2 +1,2 @@
 id,name,master,width,height,corner_radius,border_width,bg_color,fg_color,border_color,overwrite_preferred_drawing_method,text_color,text_color_disabled,text,font,image,compound,anchor,wraplength,textvariable,placeholder_text,hover,command,hover_color,border_spacing,checkbox_width,checkbox_height,checkmark_color,state,onvalue,offvalue,variable,button_color,button_hover_color,dropdown_fg_color,dropdown_hover_color,dropdown_text_color,dropdown_font,values,placeholder_text_color
-bt,zrgetb, bdtb, 15, 14
+bt,zrgetb, bdtb,15,14,,,,,,,,,vfefv,,,,,,,,,,,,,,,,,,,,,,,,,,

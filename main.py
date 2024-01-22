@@ -15,12 +15,12 @@ class interface(ct.CTk):
         super().__init__()
         
         self.widgets_list = []
+        self.actual_sets = []
         self.settings = None
         self.widgetapp = None
         self.project_app = None
         self.actual_widget = None
         self.line = None
-        self.actual_sets = []
         self.widlist = {}
         self.getSettings()
 
@@ -127,10 +127,7 @@ class interface(ct.CTk):
 
     def prjctInfoLoading(self, event):
         #fonction d'envoi d'une requête au programme de gestion des fichiers
-        match event :
-            case "widnamelist":
-                pass
-        return interl.getWidListRqst(self.actual_project)
+        pass
 
 
     def sideWidgetsUptdating(self):
@@ -147,21 +144,7 @@ class interface(ct.CTk):
 
 
     def modifyWid(self):
-        dico = {}
-        print(self.widlist)
-        for entries in self.actual_sets :
-            try :
-                dico[entries[1]] = entries[0].get()
-            except :
-                dico[entries[1]] = None
-        try : 
-            self.widlist.insert(self.line, dico)
-            del self.widlist[self.line + 1]
-        except :
-            try: self.widlist.append(dico)
-            except : messagebox.showwarning("Erreur de modification", "Une erreur est survenue lors de la sauvegarde des modifications.")
-        print(self.widlist)
-        #ajouter les modification dans le fichier du projet
+        pass
 
         
     def widgetParametersFrame(self, widget):
@@ -172,27 +155,21 @@ class interface(ct.CTk):
         column = 0
         loading = True
         try :
-            self.widlist = self.prjctInfoLoading()
-            widsets = interl.getWidSetsRqst(widget)
             setsinfo = interl.getSetsInfoRqst()
-        except :
-            try :
-                setsinfo = interl.getSetsInfoRqst()
-                widsets = interl.getWidSetsRqst(widget)
-            except setsinfo == None or widsets == None :
-                loading = False
-                messagebox.showwarning("Fichier introuvable", "Une erreur est survenue lors du chargement des données.")
-        print(len(self.widlist), loading)
-        
-        self.overal_lbl = ct.CTkLabel(self.edit_frame, text = "",font=ct.CTkFont(size=25, weight="bold"))
-        self.widnamelbl = ct.CTkLabel(self.edit_frame, text = "Nom du widget :",font=ct.CTkFont(size=15, weight="bold"))
-        self.widname = ct.CTkEntry(self.edit_frame, width= 150, height = 40,font=ct.CTkFont(weight="bold"))
+            widsets = interl.getWidSetsRqst(widget)
+        except setsinfo == None or widsets == None :
+            loading = False
+            messagebox.showwarning("Fichier introuvable", "Une erreur est survenue lors du chargement des données.")
 
-        self.overal_lbl.grid(column = 0, row = 0, columnspan = 4, pady = 15)
-        self.widnamelbl.grid(row = 1, column = 0, columnspan = 2, pady = 20, sticky = 'e')
-        self.widname.grid(row = 1, column = 2, columnspan = 2, pady = 20)
-        detail_dico = {"Simple" : (0,1), "Normal" : (1,2), "Complet" : (1,2,3)}
-        if loading == True and len(self.widlist) < 1 : 
+        if loading == True  : 
+            self.overal_lbl = ct.CTkLabel(self.edit_frame, text = "",font=ct.CTkFont(size=25, weight="bold"))
+            self.widnamelbl = ct.CTkLabel(self.edit_frame, text = "Nom du widget :",font=ct.CTkFont(size=15, weight="bold"))
+            self.widname = ct.CTkEntry(self.edit_frame, width= 150, height = 40,font=ct.CTkFont(weight="bold"))
+
+            self.overal_lbl.grid(column = 0, row = 0, columnspan = 4, pady = 15)
+            self.widnamelbl.grid(row = 1, column = 0, columnspan = 2, pady = 20, sticky = 'e')
+            self.widname.grid(row = 1, column = 2, columnspan = 2, pady = 20)
+            detail_dico = {"Simple" : (0,1), "Normal" : (1,2), "Complet" : (1,2,3)}
             try :
                 #-------------------- création entrées de modification des paramètres --------------------
 
@@ -215,35 +192,6 @@ class interface(ct.CTk):
                         entry.grid(row = row, column = column, padx = 5, pady = 10, sticky = 'n')
                         column = column + 1 if column < self.column_num else 0
                         row += 1 if column == 0 else 0
-            except any as error :
-                print(error)
-                messagebox.showwarning("Erreur de chargement", "Une erreur est survenue lors de l'affichage des données")
-        elif loading == True and self.widlist != {}:
-            try :    
-                for element in self.widlist :
-                    if element["name"] == widget :
-                        self.line = self.widlist.index(element)
-                        for parameter in widsets["parameters"]:
-                            if setsinfo[parameter][1] in detail_dico[self.detail_lvl] :
-                                
-                                lbl = ct.CTkLabel(self.edit_frame, text = parameter + " :", font=ct.CTkFont(size=15, weight="bold"))
-                                
-                                if parameter in ["font", "hover", "round_width_to_even_numbers", "round_height_to_even_numbers", "image"]:
-                                    entry = ct.CTkCheckBox(self.edit_frame, text = "")
-                                elif parameter in ["state", "anchor", "compound", "justify"]:
-                                    entry = ct.CTkOptionMenu(self.edit_frame, values = setsinfo[parameter][3])      
-                                else :
-                                    entry = ct.CTkEntry(self.edit_frame, width = 130,font=ct.CTkFont(weight="bold"))
-                                    entry.insert(0, element[parameter])
-                                self.actual_sets.append((entry, parameter))
-                                tl.CreateToolTip(lbl, setsinfo[parameter][2])
-                                lbl.grid(row = row, column = column, padx = 5, pady = 10, sticky = 'n')
-                                column = column + 1 if column < self.column_num else 0
-                                row += 1 if column == 0 else 0
-                        
-                                entry.grid(row = row, column = column, padx = 5, pady = 10, sticky = 'n')
-                                column = column + 1 if column < self.column_num else 0
-                                row += 1 if column == 0 else 0
             except any as error :
                 print(error)
                 messagebox.showwarning("Erreur de chargement", "Une erreur est survenue lors de l'affichage des données")

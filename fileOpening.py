@@ -114,13 +114,6 @@ def loadInfo(path : str = None, data : str = 'prjctInfo', widget : str = None):
                 return json.load(file)
         except :
             return None
-    if data == 'widlist' :
-        try : 
-            file =  open(f'{path}\widlist.csv', "r")
-            data =  csv.DictReader(file, delimiter = ",")
-            return dict(data)
-        except :
-            return None
             
 
 def writeInfo(path : str, info: Union[dict, str], type : str):
