@@ -115,7 +115,7 @@ class AppEditing(ct.CTkToplevel):
 
 
     def quitSettings(self):
-        on_quit = messagebox.askyesno("Qitter les paramètres", "Voulez-vous quitter les paramètres ?\n(les modifications ne seront pas enregistrées).")
+        on_quit = messagebox.askyesno("Quitter les paramètres", "Voulez-vous quitter les paramètres ?\n(les modifications ne seront pas enregistrées).")
         if on_quit :
             self.destroy()
 
