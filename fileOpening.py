@@ -13,15 +13,6 @@ def dirCreation(name : str):
             pass
         with open(path +"\\"+ 'code.txt', "w") as file :
             pass
-        with open(path +"\\widlist.csv", "w") as file :
-            head = loadInfo(data ="setsinfo")
-            tlist = []
-            for sets in head.keys():
-                tlist.append(sets)
-            tlist.insert(0,"id")
-            tlist.insert(1,"name")
-            writer = csv.writer(file)
-            writer.writerow(tlist)
         with open(path +"\\"+ 'widNmeList.txt', "w") as file :
             pass
     except OSError as error :
@@ -44,7 +35,7 @@ def verifyDir(name : str):
     if os.path.exists(path) :
         files = os.listdir(path)
         print(files)
-        if "code.txt" in files and "prjtset.json" in files and "widlist.csv" in files and "widNmeList.txt" in files :
+        if "code.txt" in files and "prjtset.json" in files and "widNmeList.txt" in files :
             return True
         else :
             addFiletoDir(path)
@@ -55,7 +46,7 @@ def verifyDir(path : str):
     if os.path.exists(path) :
         files = os.listdir(path)
         print(files)
-        if "code.txt" in files and "prjtset.json" in files and "widlist.csv" in files and "widNmeList.txt" in files :
+        if "code.txt" in files and "prjtset.json" in files and "widNmeList.txt" in files :
             return True
         else :
             addFiletoDir(path)
@@ -70,16 +61,6 @@ def addFiletoDir(path : str):
     if "prjtset.json" not in files :
         with open(path +"\\"+ 'prjtset.json', "w") as file :
             pass
-    if "widlist.csv"not in files :
-        with open(path +"\\"+ 'widlist.csv', "w") as file :
-            head = loadInfo(data ="setsinfo")
-            tlist = []
-            for sets in head.keys():
-                tlist.append(sets)
-            tlist.insert(0,"id")
-            tlist.insert(1,"name")
-            writer = csv.writer(file)
-            writer.writerow(tlist)
     if "widNmeList.txt" not in files :
         with open(path +"\\"+ 'widNmeList.txt', "w") as file :
             pass
@@ -114,6 +95,15 @@ def loadInfo(path : str = None, data : str = 'prjctInfo', widget : str = None):
                 return json.load(file)
         except :
             return None
+    if data == "widNameList" :
+        try :
+            with open(path + "\widNmeList.txt", 'r') as file :
+                widsaved = file.read().split(",")
+                print("oktest")
+            file.close()
+            return widsaved
+        except :
+            return []
             
 
 def writeInfo(path : str, info: Union[dict, str], type : str):
@@ -149,14 +139,18 @@ def verifyApp() -> Union[str, bool]:
         return "widgetApp.py"
     if "tool_tip.py" not in cfiles :
         return "tool_tip.py"
-    # if 'projectInfoSave.json' not in cfiles :
-    #     return "projectInfoSave.json"
-    # if "wdSettings.json" not in cfiles :
-    #     return "wdSettings.json"
-    # if "widgetInfo.json" not in cfiles :
-    #     return "widgetInfo.json"
-    # if "widgetRss.json" not in cfiles :
-    #     return "widgetRss.json"
-    # if "widParaInfo.json" not in cfiles :
-    #     return "widParaInfo.json"
+    cfiles =os.listdir(path + "\\" + "rssDir")
+    if 'prjctNameSave.txt' not in cfiles :
+        return "prjctNameSave.txt"
+    if "wdSettings.json" not in cfiles :
+        return "wdSettings.json"
+    if "widgetInfo.json" not in cfiles :
+        return "widgetInfo.json"
+    if "widgetRss.json" not in cfiles :
+        return "widgetRss.json"
+    if "widParaInfo.json" not in cfiles :
+        return "widParaInfo.json"
     return True
+
+if __name__ == "__main__" :
+    print(verifyApp())

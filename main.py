@@ -1,4 +1,5 @@
 #fichier contenant l'interface graphique du programme
+from typing import Union
 import tkinter as tk
 from tkinter import messagebox
 import customtkinter as ct
@@ -20,14 +21,12 @@ class interface(ct.CTk):
         self.widgetapp = None
         self.project_app = None
         self.actual_widget = None
-        self.line = None
-        self.widlist = {}
+        self.actual_project = None
         self.getSettings()
-
-
         self.createInterface()
         if self.actual_widget != None :
             self.widgetParametersFrame(self.actual_widget)
+        self.openProjectApp()
 
 
     def createInterface(self) :
@@ -68,6 +67,12 @@ class interface(ct.CTk):
         #-------------------- création des widgets des paramètres --------------------
 
 
+        self.createActionBt()
+
+        self.sideWidgetsUptdating()   
+            
+
+    def createActionBt(self):
         self.parameter_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100),
                                              text = "paramètres", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : self.openParameters())
         tl.CreateToolTip(self.parameter_button, text = "Bouton d'ouverture de la fenêtre de paramètres.") if self.showtooltip == "Oui" else None
@@ -75,18 +80,17 @@ class interface(ct.CTk):
         self.modify_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100),
                                              text = "modifier", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : self.modifyWid())
         tl.CreateToolTip(self.modify_button, text = "Bouton de modification des paramètres d'un widget.") if self.showtooltip == "Oui" else None
+        self.modify_button.configure(state = "disabled") if self.actual_widget == None else None
 
         self.delete_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100),
                                              text = "supprimer", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10)
         tl.CreateToolTip(self.delete_button, text = "Bouton de suppression d'un widget.") if self.showtooltip == "Oui" else None
-
+        self.delete_button.configure(state = "disabled") if self.actual_widget == None else None
         
         self.delete_button.place(x = self.width*(5/200), y = self.height*(3/200))
         self.modify_button.place(x = self.width*(35/200), y = self.height*(3/200))
         self.parameter_button.place(x = self.width*(70/200), y = self.height*(3/200))
-
-        self.sideWidgetsUptdating()   
-
+    
 
     def getSettings(self):
 
@@ -107,7 +111,7 @@ class interface(ct.CTk):
         self.minsize(self.width, self.height)
 
 
-    def clear(self, mod):
+    def clear(self, mod : str):
         if mod == 'all' :
             liste = self.grid_slaves() + self.pack_slaves()
             for element in liste :
@@ -115,6 +119,7 @@ class interface(ct.CTk):
             self.createInterface()
             if self.actual_widget != None :
                 self.widgetParametersFrame(self.actual_widget)
+            self.sideWidgetsUptdating()
         if mod == 'itemFrame' :
             liste = self.main_item_frame.grid_slaves()
             for element in liste :
@@ -127,7 +132,10 @@ class interface(ct.CTk):
 
     def prjctInfoLoading(self, event):
         #fonction d'envoi d'une requête au programme de gestion des fichiers
-        pass
+        if event == "widnamelist" :
+            self.widgets_list = interl.getWidNameListReq(self.actual_project)
+            self.clear("itemFrame")
+            self.sideWidgetsUptdating()
 
 
     def sideWidgetsUptdating(self):
@@ -136,6 +144,7 @@ class interface(ct.CTk):
         self.add_button = ct.CTkButton(self.main_item_frame, width= self.width*(16/100), height= 40, text = "Ajouter",border_width= 2, border_color = "#FFFFFF",
                                        font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command= lambda : self.widgetAdding())
         tl.CreateToolTip(self.add_button, text = "Bouton d'ajout de widgets dans le projet.") if self.showtooltip == "Oui" else None
+        self.add_button.configure(state = "disabled") if self.actual_project == None else None
         self.add_button.grid(padx = 5, pady = 5)
         for widgets in self.widgets_list :
             w_bt = ct.CTkButton(self.main_item_frame, text = widgets, width= self.width*(16/100), height= self.height*(6/100), 
@@ -150,6 +159,7 @@ class interface(ct.CTk):
     def widgetParametersFrame(self, widget):
         self.clear("sets")
         self.actual_widget = widget
+        self.createActionBt()
         self.column_num = 1 if self.width*(30/100) < 400 else 3
         row = 2
         column = 0
@@ -210,12 +220,13 @@ class interface(ct.CTk):
             self.project_app = None
             if self.actual_project != None :
                 self.title(f"Saturne : {self.actual_project}")
+                self.prjctInfoLoading(event = "widnamelist")
             else :
                 self.title("Saturne")
-                self.prjctInfoLoading(event = "widnamelist")
+                self.resetAttr()
         else :
             print("fenêtre de projets déjà ouverte")
-            self.project_app.focus()
+        self.clear('all')
 
 
     def openParameters(self):
@@ -228,7 +239,6 @@ class interface(ct.CTk):
             self.clear('all')
         else :
             print("fenêtre de paramètres déjà ouverte")
-            self.settings.focus()
 
 
     def widgetAdding(self):
@@ -242,7 +252,6 @@ class interface(ct.CTk):
             self.sideWidgetsUptdating()
         else :
             print("fenêtre d'ajout d'un widget déjà ouverte")
-            self.widgetapp.focus()
 
 
     def verifyFiles(self):
@@ -252,6 +261,11 @@ class interface(ct.CTk):
         else :
             messagebox.showinfo("Fichiers complets", "Tous les fichiers sont présents")
         
+
+    def resetAttr(self):
+        if self.actual_project == None :
+            self.widgets_list = []
+            self.actual_widget = None
 
 if __name__ == "__main__":
     app = interface()

@@ -63,3 +63,8 @@ def verifyFilesRqst()-> list:
         if not  fileop.verifyDir(fileop.createPath(projects)) :
             return [projects, 'project']
     return [fileop.verifyApp(), 'file']
+
+
+def getWidNameListReq(project):
+    path = fileop.createPath(project)
+    return fileop.loadInfo(path, data = "widNameList")
