@@ -2,7 +2,6 @@
 from typing import *
 import os
 import json
-import csv 
 
 
 def dirCreation(name : str):
@@ -76,44 +75,56 @@ def rmFile(path : str):
 
 
 def loadInfo(path : str = None, data : str = 'prjctInfo', widget : str = None):
-    if data == 'prjctInfo' : 
-        if verifyDir(path = path) :
-            try : 
-                with open(path + '\\prjtset.json', "r") as file:
-                    return json.load(file)
-            except :
-                return None
     if data == "widsets" :
         try : 
-            with open('rssDir\widgetInfo.json', "r") as file:
+            with open('rssDir\widgetInfo.json', "r", encoding= 'utf8') as file:
                 return json.load(file)[widget]
         except :
             return None
     if data == 'setsinfo' :
         try : 
-            with open('rssDir\widParaInfo.json', "r") as file:
+            with open('rssDir\widParaInfo.json', "r", encoding= 'utf8') as file:
                 return json.load(file)
         except :
             return None
+    if data == 'prjctInfo' : 
+        if verifyDir(path = path) :
+            try : 
+                with open(path + '\\prjtset.json', "r", encoding= 'utf8' ) as file:
+                    return json.load(file)
+            except :
+                return None
     if data == "widNameList" :
         try :
-            with open(path + "\widNmeList.txt", 'r') as file :
+            with open(path + "\widNmeList.txt", 'r', encoding= 'utf8') as file :
                 widsaved = file.read().split(",")
-                print("oktest")
             file.close()
             return widsaved
         except :
             return []
+    if data == "actualwidSet" :
+        try :
+            with open(path, 'r', encoding= 'utf8') as file :
+                return json.load(file)
+        except :
+            return False
             
 
 def writeInfo(path : str, info: Union[dict, str], type : str):
     if type == "json" :
-        with open(path, "w") as file :
+        with open(path, "w", encoding= 'utf8') as file :
             json.dump(info, file)
             
     
 def createPath(target : str):
     return os.getcwd() +"\\"+ target
+
+
+def cWSF(path : str, name : str, settings : dict):
+    with open(path + "\\" + name + ".json", "w", encoding= 'utf8') as file :
+        json.dump(settings, file)
+    with open(path + "\widNmeList.txt", 'a', encoding= 'utf8') as file :
+        file.write("," + name)
 
 
 def verifyApp() -> Union[str, bool]:
@@ -151,6 +162,7 @@ def verifyApp() -> Union[str, bool]:
     if "widParaInfo.json" not in cfiles :
         return "widParaInfo.json"
     return True
+
 
 if __name__ == "__main__" :
     print(verifyApp())

@@ -147,9 +147,11 @@ class interface(ct.CTk):
         self.add_button.configure(state = "disabled") if self.actual_project == None else None
         self.add_button.grid(padx = 5, pady = 5)
         for widgets in self.widgets_list :
-            w_bt = ct.CTkButton(self.main_item_frame, text = widgets, width= self.width*(16/100), height= self.height*(6/100), 
-                                font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda w_id = widgets : self.widgetParametersFrame(w_id))
-            w_bt.grid(padx = 5, pady = 5)
+            if widgets != "" :
+                w_bt = ct.CTkButton(self.main_item_frame, text = widgets, width= self.width*(16/100), height= self.height*(6/100), 
+                                    font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda w_id = widgets : self.widgetParametersFrame(w_id))
+                w_bt.grid(padx = 5, pady = 5)
+            else : pass
 
 
     def modifyWid(self):
@@ -165,27 +167,33 @@ class interface(ct.CTk):
         column = 0
         loading = True
         try :
+            actualwidset = interl.getWidSetReq(self.actual_widget, self.actual_project)
+            if actualwidset == False : gotwid = False
+            else : gotwid = True
+        except any as error :
+            print(error)
+        try :
             setsinfo = interl.getSetsInfoRqst()
-            widsets = interl.getWidSetsRqst(widget)
+            widsets = interl.getMainWidSetsRqst(actualwidset["ID"])
         except setsinfo == None or widsets == None :
             loading = False
             messagebox.showwarning("Fichier introuvable", "Une erreur est survenue lors du chargement des données.")
 
-        if loading == True  : 
-            self.overal_lbl = ct.CTkLabel(self.edit_frame, text = "",font=ct.CTkFont(size=25, weight="bold"))
-            self.widnamelbl = ct.CTkLabel(self.edit_frame, text = "Nom du widget :",font=ct.CTkFont(size=15, weight="bold"))
-            self.widname = ct.CTkEntry(self.edit_frame, width= 150, height = 40,font=ct.CTkFont(weight="bold"))
-
-            self.overal_lbl.grid(column = 0, row = 0, columnspan = 4, pady = 15)
-            self.widnamelbl.grid(row = 1, column = 0, columnspan = 2, pady = 20, sticky = 'e')
-            self.widname.grid(row = 1, column = 2, columnspan = 2, pady = 20)
-            detail_dico = {"Simple" : (0,1), "Normal" : (1,2), "Complet" : (1,2,3)}
+        if loading == True : #gotwid == False
             try :
                 #-------------------- création entrées de modification des paramètres --------------------
 
+                self.overal_lbl = ct.CTkLabel(self.edit_frame, text = "",font=ct.CTkFont(size=25, weight="bold"))
+                self.widnamelbl = ct.CTkLabel(self.edit_frame, text = "Nom du widget :",font=ct.CTkFont(size=15, weight="bold"))
+                self.widname = ct.CTkEntry(self.edit_frame, width= 150, height = 40,font=ct.CTkFont(weight="bold"))
+
+                self.overal_lbl.grid(column = 0, row = 0, columnspan = 4, pady = 15)
+                self.widnamelbl.grid(row = 1, column = 0, columnspan = 2, pady = 20, sticky = 'e')
+                self.widname.grid(row = 1, column = 2, columnspan = 2, pady = 20)
+                detail_dico = {"Simple" : (0,1), "Normal" : (1,2), "Complet" : (1,2,3)}
+
                 for parameter in widsets["parameters"]:
                     if setsinfo[parameter][1] in detail_dico[self.detail_lvl] :
-                        
                         lbl = ct.CTkLabel(self.edit_frame, text = parameter + " :", font=ct.CTkFont(size=15, weight="bold"))
                         if parameter in ["font", "hover", "round_width_to_even_numbers", "round_height_to_even_numbers", "image"]:
                             entry = ct.CTkCheckBox(self.edit_frame, text = "")
@@ -247,7 +255,9 @@ class interface(ct.CTk):
             self.widgetapp.grab_set()
             newwidget = self.widgetapp.get()
             if newwidget != None :
+                newwidget = interl.createWidSetFileReq(newwidget, self.actual_project)
                 self.widgets_list.append(newwidget)
+
             self.widgetapp = None
             self.sideWidgetsUptdating()
         else :

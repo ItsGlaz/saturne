@@ -22,21 +22,6 @@ def rmproject(name : str):
 
 def modidyPrjctRqst(name : str, dico : dict):
     flmngt.modifyPrjtInfo(name, dico)
-    
-
-# def ctrlMod(
-#         info : Union[dict, str, int, list], 
-#         validtype : str = 'int'
-#         ):
-
-#     match validtype :
-        
-#         case 'int' :
-#             try :
-#                 info = int(info)
-#                 return info
-#             except :
-#                 return False
 
 
 def getPrjtSetRqst(name : str) -> dict:
@@ -45,7 +30,7 @@ def getPrjtSetRqst(name : str) -> dict:
     return fileop.loadInfo(path = path)
 
 
-def getWidSetsRqst(widget) -> dict:
+def getMainWidSetsRqst(widget) -> dict:
     return fileop.loadInfo(data = "widsets", widget = widget)
 
 def getSetsInfoRqst() -> dict:
@@ -68,3 +53,12 @@ def verifyFilesRqst()-> list:
 def getWidNameListReq(project):
     path = fileop.createPath(project)
     return fileop.loadInfo(path, data = "widNameList")
+
+
+def getWidSetReq(widname : str, project : str):
+    path = fileop.createPath(project + "\\" + widname + ".json")
+    return fileop.loadInfo(path, "actualwidSet")
+
+
+def createWidSetFileReq(newwidget, project):
+    return flmngt.CreateNewWidSetFile(newwidget, project)

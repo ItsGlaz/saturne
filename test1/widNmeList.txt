@@ -1,1 +1,1 @@
-bt,bt,bt
+,label,bt1,bt2,label1,optionmenu1,checkbox1,frame1,entry1,label2,label3,label4
