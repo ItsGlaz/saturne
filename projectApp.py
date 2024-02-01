@@ -6,7 +6,7 @@ import intermediateLayer as interl
 
 class ProjectApp(ct.CTkToplevel):
 
-    def __init__(self, mod = None):
+    def __init__(self):
         super().__init__()
 
         self.newprojectname = None
@@ -113,7 +113,7 @@ class ProjectApp(ct.CTkToplevel):
 
     
     def openProjectInfo(self):
-        with open("rssDir\prjctNameSave.txt", "r") as file :
+        with open("rssDir\prjctNameSave.txt", "r", encoding= 'utf8') as file :
             self.project_info = file.read().split(",")
         file.close()
 
@@ -136,7 +136,7 @@ class ProjectApp(ct.CTkToplevel):
         converted_info = ",".join(self.project_info)
 
         
-        with open("rssDir\prjctNameSave.txt", "w") as file :
+        with open("rssDir\prjctNameSave.txt", "w", encoding= 'utf8') as file :
             file.write(converted_info)
         file.close()
         
@@ -155,7 +155,7 @@ class ProjectApp(ct.CTkToplevel):
                 interl.rmproject(project)
             del self.project_info[self.project_info.index(project)]
             converted_info = ",".join(self.project_info)
-            with open("rssDir\prjctNameSave.txt", "w") as file :
+            with open("rssDir\prjctNameSave.txt", "w", encoding= 'utf8') as file :
                 file.write(converted_info)
             file.close()
             

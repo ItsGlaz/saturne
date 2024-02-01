@@ -36,6 +36,6 @@
     "dropdown_text_color": ["None",2, ""],
     "dropdown_font": ["None",3, ""],
     "values": ["None",1, "valeurs prises en compte par le widget"],
-    "placeholder_text_color": ["None",3, ""]
-
+    "placeholder_text_color": ["None",3, ""],
+    "background_corner_colors" : ["None", 3, "couleur de l'arrière plan"]
 }

@@ -2,7 +2,6 @@
 from typing import *
 import os
 import json
-import csv 
 
 
 def dirCreation(name : str):
@@ -21,7 +20,7 @@ def dirCreation(name : str):
 
 def rmDirectory(name : str):
     path =  os.getcwd() +"\\"+ name
-    rmFile(path)
+    rmFiles(path)
     os.rmdir(path)
 
 
@@ -66,7 +65,7 @@ def addFiletoDir(path : str):
             pass
 
 
-def rmFile(path : str):
+def rmFiles(path : str):
     files_list = os.listdir(path)
     for files in files_list :
         try: 
@@ -75,46 +74,84 @@ def rmFile(path : str):
             os.rmdir()
 
 
+def rmFile(path : str):
+    os.remove(path)
+
+def rmWid(widget : str, project : str) : 
+    path = createPath(project)
+    os.remove(path + "\\" + widget + ".json")
+    with open(path + "\widNmeList.txt", 'r', encoding= 'utf8') as file :
+        data = file.read().split(",")
+        del data[data.index(widget)]
+    with open(path + "\widNmeList.txt", 'w', encoding= 'utf8') as file :
+        file.write(data)
+
 def loadInfo(path : str = None, data : str = 'prjctInfo', widget : str = None):
-    if data == 'prjctInfo' : 
-        if verifyDir(path = path) :
-            try : 
-                with open(path + '\\prjtset.json', "r") as file:
-                    return json.load(file)
-            except :
-                return None
     if data == "widsets" :
         try : 
-            with open('rssDir\widgetInfo.json', "r") as file:
+            with open('rssDir\widgetInfo.json', "r", encoding= 'utf8') as file:
                 return json.load(file)[widget]
         except :
             return None
     if data == 'setsinfo' :
         try : 
-            with open('rssDir\widParaInfo.json', "r") as file:
+            with open('rssDir\widParaInfo.json', "r", encoding= 'utf8') as file:
                 return json.load(file)
         except :
             return None
+    if data == 'prjctInfo' : 
+        if verifyDir(path = path) :
+            try : 
+                with open(path + '\\prjtset.json', "r", encoding= 'utf8' ) as file:
+                    return json.load(file)
+            except :
+                return None
     if data == "widNameList" :
         try :
-            with open(path + "\widNmeList.txt", 'r') as file :
+            with open(path + "\widNmeList.txt", 'r', encoding= 'utf8') as file :
                 widsaved = file.read().split(",")
-                print("oktest")
             file.close()
             return widsaved
         except :
             return []
+    if data == "actualwidSet" :
+        try :
+            with open(path, 'r', encoding= 'utf8') as file :
+                return json.load(file)
+        except :
+            return False
             
 
 def writeInfo(path : str, info: Union[dict, str], type : str):
     if type == "json" :
-        with open(path, "w") as file :
+        with open(path, "w", encoding= 'utf8') as file :
             json.dump(info, file)
             
     
 def createPath(target : str):
     return os.getcwd() +"\\"+ target
 
+
+def cWSF(path : str, name : str, settings : dict):
+    with open(path + "\\" + name + ".json", "w", encoding= 'utf8') as file :
+        json.dump(settings, file)
+    with open(path + "\widNmeList.txt", 'a', encoding= 'utf8') as file :
+        file.write("," + name)
+    
+
+def mWS(path : str, newname : str, oldname : str, settings : dict) :
+    with open(path + "\\" + newname + ".json", "w", encoding= 'utf8') as file :
+        json.dump(settings, file)
+    if newname != oldname :
+        with open(path + "\widNmeList.txt", 'r', encoding= 'utf8') as file :
+            data = file.read().split(',')
+            print(data)
+            data.insert(data.index(oldname), newname)
+            del data[data.index(oldname)]
+            print(data)
+            data = ','.join(data)
+        with open(path + "\widNmeList.txt", 'w', encoding= 'utf8') as file :
+            file.write(data)
 
 def verifyApp() -> Union[str, bool]:
     """verifyApp 
@@ -151,6 +188,7 @@ def verifyApp() -> Union[str, bool]:
     if "widParaInfo.json" not in cfiles :
         return "widParaInfo.json"
     return True
+
 
 if __name__ == "__main__" :
     print(verifyApp())
