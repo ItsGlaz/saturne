@@ -6,7 +6,7 @@ import intermediateLayer as interl
 
 class ProjectApp(ct.CTkToplevel):
 
-    def __init__(self, mod = None):
+    def __init__(self):
         super().__init__()
 
         self.newprojectname = None

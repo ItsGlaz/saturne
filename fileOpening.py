@@ -20,7 +20,7 @@ def dirCreation(name : str):
 
 def rmDirectory(name : str):
     path =  os.getcwd() +"\\"+ name
-    rmFile(path)
+    rmFiles(path)
     os.rmdir(path)
 
 
@@ -65,7 +65,7 @@ def addFiletoDir(path : str):
             pass
 
 
-def rmFile(path : str):
+def rmFiles(path : str):
     files_list = os.listdir(path)
     for files in files_list :
         try: 
@@ -73,6 +73,18 @@ def rmFile(path : str):
         except : 
             os.rmdir()
 
+
+def rmFile(path : str):
+    os.remove(path)
+
+def rmWid(widget : str, project : str) : 
+    path = createPath(project)
+    os.remove(path + "\\" + widget + ".json")
+    with open(path + "\widNmeList.txt", 'r', encoding= 'utf8') as file :
+        data = file.read().split(",")
+        del data[data.index(widget)]
+    with open(path + "\widNmeList.txt", 'w', encoding= 'utf8') as file :
+        file.write(data)
 
 def loadInfo(path : str = None, data : str = 'prjctInfo', widget : str = None):
     if data == "widsets" :
@@ -125,7 +137,21 @@ def cWSF(path : str, name : str, settings : dict):
         json.dump(settings, file)
     with open(path + "\widNmeList.txt", 'a', encoding= 'utf8') as file :
         file.write("," + name)
+    
 
+def mWS(path : str, newname : str, oldname : str, settings : dict) :
+    with open(path + "\\" + newname + ".json", "w", encoding= 'utf8') as file :
+        json.dump(settings, file)
+    if newname != oldname :
+        with open(path + "\widNmeList.txt", 'r', encoding= 'utf8') as file :
+            data = file.read().split(',')
+            print(data)
+            data.insert(data.index(oldname), newname)
+            del data[data.index(oldname)]
+            print(data)
+            data = ','.join(data)
+        with open(path + "\widNmeList.txt", 'w', encoding= 'utf8') as file :
+            file.write(data)
 
 def verifyApp() -> Union[str, bool]:
     """verifyApp 

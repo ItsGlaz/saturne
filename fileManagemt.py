@@ -6,17 +6,26 @@ def modifyPrjtInfo(name : str, newinfo : dict):
     fileop.writeInfo(get_path, newinfo, "json")
 
 
-def CreateNewWidSetFile(widget, project):
+def cNWSF(widget, project):
+    """cNWSF : Create New Widget Settings File
+
+    Parameters
+    ----------
+    widget : _type_
+        _description_
+    project : _type_
+        _description_
+
+    Returns
+    -------
+    _type_
+        _description_
+    """
     sets = fileop.loadInfo(data = "widsets", widget = widget)
     setvalues = fileop.loadInfo(data = "setsinfo")
 
     path = fileop.createPath(project)
     widnameused = fileop.loadInfo(path = path,data = "widNameList")
-    dico = {}
-    dico["name"] = ""
-    dico["ID"] = widget
-    for values in sets["parameters"]:
-        dico [values] = setvalues[values][0]
     flag = False
     incr = 1
     while flag == False :
@@ -24,8 +33,36 @@ def CreateNewWidSetFile(widget, project):
             flag = True
             newname = widget + str(incr)
         else : incr += 1
-    
-    #créer le fichier
+    dico = {}
+    dico["name"] = newname
+    dico["ID"] = widget
+    for values in sets["parameters"]:
+        dico [values] = setvalues[values][0]
     fileop.cWSF(path, newname, dico)
-    #renvoyer le l'ID du widget
     return newname 
+
+
+def uWS(widid : str, widname : str, dico : dict, project : str) -> None:
+    """uWS : Update Widget Settings
+
+    Parameters
+    ----------
+    wid : str
+        _description_
+    dico : dict
+        _description_
+    """
+    datasets = {}
+    datasets["name"] = dico["name"]
+    datasets["ID"] = dico["ID"]
+    sets = fileop.loadInfo(data = "widsets", widget = widid)
+    setvalues = fileop.loadInfo(data = "setsinfo")
+    for settings in sets["parameters"] :
+        if settings in dico :
+            datasets[settings] = dico[settings]
+        else :
+            datasets[settings] = setvalues[settings][0]
+    print(datasets)
+    path = fileop.createPath(project)
+    fileop.rmFile(path + "\\" + widname + '.json')
+    fileop.mWS(path, dico["name"], widname, datasets)
