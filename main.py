@@ -62,12 +62,13 @@ class interface(ct.CTk):
         self.config(menu=self.menubar)
 
         self.fichier = tk.Menu(self.menubar, tearoff = False)
-        self.fichier.add_command(label = "ouvrir un projet", command = lambda x = None : self.openProjectApp(x))
-        self.fichier.add_command(label = "nouveau projet", command = lambda x = "new" : self.openProjectApp(x))
+        self.fichier.add_command(label = "Ouvrir un projet", command = lambda x = None : self.openProjectApp(x))
+        self.fichier.add_command(label = "Nouveau projet", command = lambda x = "new" : self.openProjectApp(x))
+        self.fichier.add_separator()
+        self.fichier.add_command(label = "Enregistrer", command = lambda : None)
+        self.fichier.add_command(label='Vérifier les fichiers', command = lambda : self.verifyFiles())
         self.fichier.add_separator() 
-        self.fichier.add_command(label = "enregistrer", command = lambda : None)
-        self.fichier.add_command(label='vérifier les fichiers', command = lambda : self.verifyFiles())
-
+        self.fichier.add_command(label='Quitter', command = lambda : self.on_quit())
         self.menubar.add_cascade(label = "fichiers", menu = self.fichier)
         
 
@@ -93,7 +94,7 @@ class interface(ct.CTk):
         self.modify_button.configure(state = "disabled") if self.actual_widget == None else None
 
         self.delete_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100),
-                                             text = "supprimer", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10)
+                                             text = "supprimer", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : self.delWid())
         tl.CreateToolTip(self.delete_button, text = "Bouton de suppression d'un widget.") if self.showtooltip == "Oui" else None
         self.delete_button.configure(state = "disabled") if self.actual_widget == None else None
         
@@ -139,6 +140,7 @@ class interface(ct.CTk):
         row = 2
         column = 0
         loading = True
+
         try :
             #on récupère les données du widget, les données associées à chaque paramètre, et les paramètre par défaut du widget
             actualwidset = self.fLoadFunct("getWidSet")
@@ -171,19 +173,24 @@ class interface(ct.CTk):
                 
                 #on crée le reste des paramètres, selon le type ( soit une entrée texte, un menu, ou un switch)
                 for parameter in widsets["parameters"]:
+                    
                     if setsinfo[parameter][1] in detail_dico[self.detail_lvl] :
                         lbl = ct.CTkLabel(self.edit_frame, text = parameter + " :", font=ct.CTkFont(size=15, weight="bold"))
+                        
                         if parameter in ["font", "hover", "round_width_to_even_numbers", "round_height_to_even_numbers", "image"]:
                             entry = ct.CTkSwitch(self.edit_frame, text = "", onvalue="1", offvalue="0", switch_width= 48,switch_height= 18)
                             entry.select() if actualwidset[parameter] == 1 else None
+                        
                         elif parameter in ["state", "anchor", "compound", "justify"]:
                             entry = ct.CTkOptionMenu(self.edit_frame, values = setsinfo[parameter][3])    
                             entry.set(actualwidset[parameter])  
+                        
                         else :
                             entry = ct.CTkEntry(self.edit_frame, width = 130,font=ct.CTkFont(weight="bold"))
                             entry.insert(0, actualwidset[parameter])
                         self.actual_sets.append((entry, parameter))
                         tl.CreateToolTip(lbl, setsinfo[parameter][2]) if self.showtooltip == "Oui" else None
+                        
                         lbl.grid(row = row, column = column, padx = 5, pady = 10, sticky = 'n')
                         column = column + 1 if column < self.column_num else 0
                         row += 1 if column == 0 else 0
@@ -300,9 +307,14 @@ class interface(ct.CTk):
         with open("rssDir\wdSettings.json", "r") as file :
             self.parameters = json.load(file)
         file.close()
-
-        self.width       = self.parameters["width"]
-        self.height      = self.parameters["height"]
+        if self.parameters["fullscreen"]: 
+            self.width   = self.winfo_screenwidth() -10
+            self.height  = self.winfo_screenheight() -10
+            self.attributes('-fullscreen', True)
+        else : 
+            self.attributes('-fullscreen', False)
+            self.width   = self.parameters["width"]
+            self.height  = self.parameters["height"]
         self.showtooltip = self.parameters["tooltip"]
         self.detail_lvl  = self.parameters["detail"]
 
@@ -340,6 +352,19 @@ class interface(ct.CTk):
         Fonction de suppression d'un widget.
         """
         interl.delWidReq(self.actual_widget, self.actual_project)
+        self.fLoadFunct('widnamelist')
+        self.clear("sets")
+        self.actual_widget = None
+        self.widget_id = None
+        self.widgets_list = []
+        self.createActionBt()
+
+    
+    def on_quit(self):
+        """on_quit 
+        Détruit la fenêtre lorsque le bouton "Quitter" du menu est pressé
+        """
+        self.destroy()
 
 #-------------------- fonctions de création de fenêtres enfant --------------------
     
