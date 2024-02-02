@@ -54,21 +54,27 @@ class AppEditing(ct.CTkToplevel):
         self.screen_width.insert(0, self.parameters["width"])
         self.screen_height.insert(0, self.parameters["height"])
 
+        self.fullscreenlbl = ct.CTkLabel(self.infotabview.tab("Affichage"), text = "Plein écran", font=ct.CTkFont(size=15, weight="bold"))
+        self.fullscreen = ct.CTkSwitch(self.infotabview.tab("Affichage"), text = "", onvalue= 1, offvalue= 0, switch_width= 48, switch_height= 18)
+        self.fullscreen.select() if self.parameters["fullscreen"] else None
         self.get_tooltip_lbl = ct.CTkLabel(self.infotabview.tab("Affichage"), text = "Afficher les tooltip :", font=ct.CTkFont(size=15, weight="bold"))
         self.get_tooltip = ct.CTkSegmentedButton(self.infotabview.tab("Affichage"), values = ["Oui", "Non"])
         self.get_tooltip.set(self.parameters["tooltip"])
 
 
         self.affichage_lbl.grid(row = 0, column =0, columnspan = 2, pady = 10, sticky = 'w')
-        self.sub_res_frame.grid(row = 0, column =0, columnspan = 2, pady = 10, sticky = 'w')
+        self.sub_res_frame.grid(row = 1, column =0, columnspan = 2, pady = 10, sticky = 'w')
 
-        self.screen_res_lbl.grid(row = 1, column = 0, padx = 10, pady = 10, sticky = 'w')
-        self.screen_width.grid(row = 1, column = 1, padx = 5, pady = 10)
-        self.pixel_ind_lbl.grid(row = 1, column = 2, pady = 10, sticky = 'w')
-        self.screen_height.grid(row = 1, column = 3, padx = 5, pady = 10)
+        self.screen_res_lbl.grid(row = 0, column = 0, padx = 10, pady = 10, sticky = 'w')
+        self.screen_width.grid(row = 0, column = 1, padx = 5, pady = 10)
+        self.pixel_ind_lbl.grid(row =0, column = 2, pady = 10, sticky = 'w')
+        self.screen_height.grid(row = 0, column = 3, padx = 5, pady = 10)
 
-        self.get_tooltip_lbl.grid(row = 2, column = 0, padx = 10, pady = 10, sticky = 'w')
-        self.get_tooltip.grid(row = 2, column = 1, padx = 10, pady = 10, ipadx = 20)
+        self.fullscreenlbl.grid(row = 2, column = 0, padx = 10, pady = 10, sticky = 'w')
+        self.fullscreen.grid( row = 2, column = 1, padx = 10, pady = 10, sticky = 'w')
+
+        self.get_tooltip_lbl.grid(row = 3, column = 0, padx = 10, pady = 10, sticky = 'w')
+        self.get_tooltip.grid(row = 3, column = 1, padx = 10, pady = 10, ipadx = 20)
 
 
         #-------------------- Création de la fenêtre "Fonctionnement" --------------------
@@ -124,6 +130,7 @@ class AppEditing(ct.CTkToplevel):
         try :
             self.parameters["width"] = int(self.screen_width.get())
             self.parameters["height"] = int(self.screen_height.get())
+            self.parameters["fullscreen"] = self.fullscreen.get()
             self.parameters["tooltip"]     = self.get_tooltip.get()
             self.parameters["detail"]      = self.detail_lvl.get()
             self.parameters["color"]       = self.theme_translation["fra-eng"][self.color.get()]
@@ -142,7 +149,7 @@ class AppEditing(ct.CTkToplevel):
     
 
 if __name__ == "__main__" :
-    with open ("wdSettings.json", "r") as file :
+    with open ("rssDir\wdSettings.json", "r") as file :
         settings = json.load(file)
     app = AppEditing(settings)
     app.mainloop()
