@@ -43,7 +43,7 @@ class interface(ct.CTk):
         
         self.code_frame = ct.CTkFrame(self, width=self.width*(45/100), height=self.height, border_width=2, border_color="#000000")
         self.edit_frame = ct.CTkScrollableFrame(self, width=self.width*(35/100), height=self.height*(90/100))
-        self.parameter_frame = ct.CTkFrame(self, height = self.height*(10/100), width = self.width*(55/100))
+        self.actionbtframe = ct.CTkFrame(self, height = self.height*(10/100), width = self.width*(55/100))
 
         self.main_item_frame = ct.CTkScrollableFrame(self, height = self.height*(85/100), width = self.width*(18/100), label_text = "widgets :")
 
@@ -52,7 +52,7 @@ class interface(ct.CTk):
         self.edit_frame.grid(row = 0, column = 1, sticky = "e")
         
         self.main_item_frame.grid(row = 0, column = 2, sticky = "e")
-        self.parameter_frame.grid(row = 1,column =1, columnspan = 2 )
+        self.actionbtframe.grid(row = 1,column =1, columnspan = 2 )
 
 
         #-------------------- création du menu --------------------
@@ -84,16 +84,16 @@ class interface(ct.CTk):
         """createActionBt 
         fonction de création des boutons d'actions ( bouton de suppression et de modification de widget, et bouton d'ouverture des paramètres)
         """
-        self.parameter_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100),
+        self.parameter_button = ct.CTkButton(self.actionbtframe,  width= self.width*(10/100), height= self.height*(6/100),
                                              text = "paramètres", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : self.openParameters())
         tl.CreateToolTip(self.parameter_button, text = "Bouton d'ouverture de la fenêtre de paramètres.") if self.showtooltip == "Oui" else None
 
-        self.modify_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100),
+        self.modify_button = ct.CTkButton(self.actionbtframe,  width= self.width*(10/100), height= self.height*(6/100),
                                              text = "modifier", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : self.modifyWid())
         tl.CreateToolTip(self.modify_button, text = "Bouton de modification des paramètres d'un widget.") if self.showtooltip == "Oui" else None
         self.modify_button.configure(state = "disabled") if self.actual_widget == None else None
 
-        self.delete_button = ct.CTkButton(self.parameter_frame,  width= self.width*(10/100), height= self.height*(6/100),
+        self.delete_button = ct.CTkButton(self.actionbtframe,  width= self.width*(10/100), height= self.height*(6/100),
                                              text = "supprimer", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : self.delWid())
         tl.CreateToolTip(self.delete_button, text = "Bouton de suppression d'un widget.") if self.showtooltip == "Oui" else None
         self.delete_button.configure(state = "disabled") if self.actual_widget == None else None
@@ -132,11 +132,12 @@ class interface(ct.CTk):
             widget dont la fonction doit afficher les paramètres, et leurx valeurs respectives
         """
         self.clear("sets")
+        self.actual_sets = []
         self.actual_widget = widget
         #on configue les boutons d'action pour les rendre actifs
         self.createActionBt()
         #on configure la disposition des paramètres selon la largeur de la fenêtre
-        self.column_num = 1 if self.width*(30/100) < 470 else 3
+        self.column_num = 1 if self.width*(30/100) < 500 else 3
         row = 2
         column = 0
         loading = True
@@ -155,15 +156,17 @@ class interface(ct.CTk):
         if loading == True :
             try :
                 #-------------------- création des entrées de modification des paramètres --------------------
-
+                
+                self.settings_frame = ct.CTkFrame(self.edit_frame)
+                self.settings_frame.grid( row = 1, column = 0)
                 #on crée le label titre, ainsi que l'entrée permettant de renseigner le nom du widget
                 self.overal_lbl = ct.CTkLabel(self.edit_frame, text = actualwidset["name"],font=ct.CTkFont(size=25, weight="bold"))
-                self.widnamelbl = ct.CTkLabel(self.edit_frame, text = "Nom du widget :",font=ct.CTkFont(size=15, weight="bold"))
-                self.widname = ct.CTkEntry(self.edit_frame, width= 150, height = 40,font=ct.CTkFont(weight="bold"))
+                self.widnamelbl = ct.CTkLabel(self.settings_frame, text = "Nom du widget :",font=ct.CTkFont(size=15, weight="bold"))
+                self.widname = ct.CTkEntry(self.settings_frame, width= 150, height = 40,font=ct.CTkFont(weight="bold"))
                 tl.CreateToolTip(self.widnamelbl, "Nom du widget, attention ce nom sera aussi utilisé comme nom de variable dans le code.") if self.showtooltip == "Oui" else None
                 self.widname.insert(0, actualwidset["name"])
 
-                self.overal_lbl.grid(column = 0, row = 0, columnspan = 4 if self.column_num == 3 else 2 , pady = 15)
+                self.overal_lbl.grid(column = 0, row = 0 , pady = 15)
                 self.widnamelbl.grid(row = 1, column = 0, columnspan = 2 if self.column_num == 3 else 1, 
                                      pady = 20, sticky = 'e')
                 self.widname.grid(row = 1, column = 2 if self.column_num == 3 else 1, 
@@ -175,18 +178,18 @@ class interface(ct.CTk):
                 for parameter in widsets["parameters"]:
                     
                     if setsinfo[parameter][1] in detail_dico[self.detail_lvl] :
-                        lbl = ct.CTkLabel(self.edit_frame, text = parameter + " :", font=ct.CTkFont(size=15, weight="bold"))
+                        lbl = ct.CTkLabel(self.settings_frame, text = parameter + " :", font=ct.CTkFont(size=15, weight="bold"))
                         
-                        if parameter in ["font", "hover", "round_width_to_even_numbers", "round_height_to_even_numbers", "image"]:
-                            entry = ct.CTkSwitch(self.edit_frame, text = "", onvalue="1", offvalue="0", switch_width= 48,switch_height= 18)
+                        if parameter in ["font", "hover", "image"]:
+                            entry = ct.CTkSwitch(self.settings_frame, text = "", onvalue="1", offvalue="0", switch_width= 48,switch_height= 18)
                             entry.select() if actualwidset[parameter] == 1 else None
                         
                         elif parameter in ["state", "anchor", "compound", "justify"]:
-                            entry = ct.CTkOptionMenu(self.edit_frame, values = setsinfo[parameter][3])    
+                            entry = ct.CTkOptionMenu(self.settings_frame, values = setsinfo[parameter][3])    
                             entry.set(actualwidset[parameter])  
                         
                         else :
-                            entry = ct.CTkEntry(self.edit_frame, width = 130,font=ct.CTkFont(weight="bold"))
+                            entry = ct.CTkEntry(self.settings_frame, width = 100,font=ct.CTkFont(weight="bold"))
                             entry.insert(0, actualwidset[parameter])
                         self.actual_sets.append((entry, parameter))
                         tl.CreateToolTip(lbl, setsinfo[parameter][2]) if self.showtooltip == "Oui" else None
@@ -291,7 +294,16 @@ class interface(ct.CTk):
             self.widname.insert(0, self.actual_widget)
         
         for element in self.actual_sets :
-            dico[element[1]] = element[0].get()
+            if element[1] in ["width", "height"] :
+                dico[element[1]] = int(element[0].get())
+            elif element[1] in ["font", "image"] :
+                if element[0].get() == "0" : dico[element[1]] = 'None'
+                else : dico[element[1]] = 'None' #à modifier ultérieurement
+            elif element[1] == "hover" :
+                if element[0].get() == "0" : dico[element[1]] = "False"
+                else : dico[element[1]] = "True"
+            else : 
+                dico[element[1]] = element[0].get()
         self.fLoadFunct("modifyWidSet", dico)
         self.fLoadFunct("widnamelist")
         self.overal_lbl.configure(text = dico["name"])
