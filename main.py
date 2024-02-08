@@ -17,6 +17,7 @@ class interface(ct.CTk):
         
         self.widgets_list = []
         self.actual_sets = []
+        self.layout_list = []
         self.settings = None
         self.widgetapp = None
         self.project_app = None
@@ -158,15 +159,17 @@ class interface(ct.CTk):
                 #-------------------- création des entrées de modification des paramètres --------------------
                 
                 self.settings_frame = ct.CTkFrame(self.edit_frame)
-                self.settings_frame.grid( row = 1, column = 0)
+                self.settings_frame.grid( row = 1, column = 0, sticky = 'w')
+
                 #on crée le label titre, ainsi que l'entrée permettant de renseigner le nom du widget
                 self.overal_lbl = ct.CTkLabel(self.edit_frame, text = actualwidset["name"],font=ct.CTkFont(size=25, weight="bold"))
+
                 self.widnamelbl = ct.CTkLabel(self.settings_frame, text = "Nom du widget :",font=ct.CTkFont(size=15, weight="bold"))
                 self.widname = ct.CTkEntry(self.settings_frame, width= 150, height = 40,font=ct.CTkFont(weight="bold"))
                 tl.CreateToolTip(self.widnamelbl, "Nom du widget, attention ce nom sera aussi utilisé comme nom de variable dans le code.") if self.showtooltip == "Oui" else None
                 self.widname.insert(0, actualwidset["name"])
 
-                self.overal_lbl.grid(column = 0, row = 0 , pady = 15)
+                self.overal_lbl.grid(column = 0, row = 0 , pady = 15, sticky = 'w')
                 self.widnamelbl.grid(row = 1, column = 0, columnspan = 2 if self.column_num == 3 else 1, 
                                      pady = 20, sticky = 'e')
                 self.widname.grid(row = 1, column = 2 if self.column_num == 3 else 1, 
@@ -183,9 +186,11 @@ class interface(ct.CTk):
                         if parameter in ["font", "hover", "image"]:
                             entry = ct.CTkSwitch(self.settings_frame, text = "", onvalue="1", offvalue="0", switch_width= 48,switch_height= 18)
                             entry.select() if actualwidset[parameter] == 1 else None
+                            self.fontvar= ct.StringVar(value = actualwidset[parameter])
+                            entry.configure(command = lambda : self.showFontFrame(), variable = self.fontvar) if parameter == "font" else None
                         
                         elif parameter in ["state", "anchor", "compound", "justify"]:
-                            entry = ct.CTkOptionMenu(self.settings_frame, values = setsinfo[parameter][3])    
+                            entry = ct.CTkOptionMenu(self.settings_frame, values = setsinfo[parameter][3])  
                             entry.set(actualwidset[parameter])  
                         
                         else :
@@ -201,6 +206,16 @@ class interface(ct.CTk):
                         entry.grid(row = row, column = column, padx = 5, pady = 10, sticky = 'n')
                         column = column + 1 if column < self.column_num else 0
                         row += 1 if column == 0 else 0
+
+                self.layoutlbl = ct.CTkLabel(self.settings_frame, text = "affichage du widget : ", font=ct.CTkFont(size=15, weight="bold") )
+                self.layout = ct.CTkSegmentedButton(self.settings_frame, font=ct.CTkFont(size=15, weight="bold"), values = ["pack", "grid"], 
+                                                     command = self.showPackorGridFrame)
+                self.layout.set(actualwidset["layout"]) if actualwidset["layout"] != None else None
+                self.layoutlbl.grid(row = row +1, column = 0)
+                self.layout.grid(row = row+1, column = 1)
+
+                self.showFontFrame() if self.fontvar.get() == "1" else None
+                self.showPackorGridFrame(self.layout.get()) if self.layout.get() != "" else None
             except any as error :
                 print(error)
                 messagebox.showwarning("Erreur de chargement", "Une erreur est survenue lors de l'affichage des données")
@@ -209,6 +224,156 @@ class interface(ct.CTk):
     def codeFrame(self):
         #permet d'afficher le code de l'interface
         pass
+
+
+    def showFontFrame(self):
+        """showFontFrame 
+        Crée la boite "font" dans les paramètres du widget, 
+        est appelée lorsque le paramètre font est activé
+        """
+        self.clear("fontframe")
+        if self.fontvar.get() == "1" :
+
+            self.font_frame = ct.CTkFrame(self.edit_frame, border_width = 3, border_color= '#FFFFFF')
+            self.font_frame.grid(column = 0, row =2, pady = 30, sticky = "w", ipadx = self.width*(7/100))
+
+            self.font_lbl = ct.CTkLabel(self.font_frame, text = "Font", font=ct.CTkFont(size=20, weight="bold"))
+            self.font_lbl.grid(row = 0, column = 0, columnspan = 2, padx = 10)
+
+            self.familylbl = ct.CTkLabel(self.font_frame , text = "Family : ", font=ct.CTkFont(size=15, weight="bold") )
+            self.family = ct.CTkEntry(self.font_frame, width = 100,font=ct.CTkFont(weight="bold"))
+            self.familylbl.grid(row = 1, column = 0, padx = 10, pady = 5)
+            self.family.grid(row = 1, column = 1, padx = 10, pady = 5)
+
+            self.fontsizelbl = ct.CTkLabel(self.font_frame , text = "Size : ", font=ct.CTkFont(size=15, weight="bold") )
+            self.fontsize =ct.CTkEntry(self.font_frame, width = 100,font=ct.CTkFont(weight="bold"))
+            self.fontsizelbl.grid(row = 2, column = 0, padx = 10, pady = 5)
+            self.fontsize.grid(row = 2, column = 1, padx = 10, pady = 5)
+
+            self.fontweightlbl = ct.CTkLabel(self.font_frame , text = "Weight : ", font=ct.CTkFont(size=15, weight="bold") )
+            self.fontweight = ct.CTkOptionMenu(self.font_frame, values = ["bold", "normal"])
+            self.fontweightlbl.grid(row = 3, column = 0, padx = 10, pady = 5)
+            self.fontweight.grid(row = 3, column = 1, padx = 10, pady = 5)
+
+            self.slantlbl = ct.CTkLabel(self.font_frame , text = "Slant : ", font=ct.CTkFont(size=15, weight="bold") )
+            self.slant = ct.CTkOptionMenu(self.font_frame, values = ["italic", "roman"])
+            self.slantlbl.grid(row = 4, column = 0, padx = 10, pady = 5)
+            self.slant.grid(row = 4, column = 1, padx = 10, pady = 5)
+
+            self.underlinelbl = ct.CTkLabel(self.font_frame , text = "Underline : ", font=ct.CTkFont(size=15, weight="bold") )
+            self.underline = ct.CTkSwitch(self.font_frame, text = "", onvalue="1", offvalue="0", switch_width= 48,switch_height= 18)
+            self.underlinelbl.grid(row = 5, column = 0, padx = 10, pady = 5)
+            self.underline.grid(row = 5, column = 1, padx = 10, pady = 5)
+    
+            self.overstrikelbl = ct.CTkLabel(self.font_frame , text = "Overstrike : ", font=ct.CTkFont(size=15, weight="bold") )
+            self.overstrike = ct.CTkSwitch(self.font_frame, text = "", onvalue="1", offvalue="0", switch_width= 48,switch_height= 18)
+            self.overstrikelbl.grid(row = 6, column = 0, padx = 10, pady = 5)
+            self.overstrike.grid(row = 6, column = 1, padx = 10, pady = 5)
+
+
+    def showPackorGridFrame(self, value):
+        self.clear("layoutframe")
+        self.layout_frame = ct.CTkFrame(self.edit_frame, border_width = 3, border_color= '#FFFFFF')
+        self.layout_frame.grid(column = 0, row =3, pady = 30, sticky = "w", ipadx = self.width*(7/100))
+
+        self.layoutlbl = ct.CTkLabel(self.layout_frame, text = value, font=ct.CTkFont(size=20, weight="bold"))
+        self.layoutlbl.grid(row = 0, column = 0, columnspan = 2, padx = 10)
+        
+        self.ipadxlbl = ct.CTkLabel(self.layout_frame, text = "ipadx", font=ct.CTkFont(size=15, weight="bold"))
+        self.ipadxlbl.grid(row = 1, column = 0, padx = 10, pady = 5)
+        self.ipadx = ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
+        self.ipadx.grid(row = 1, column = 1, padx = 10, pady = 5)
+        self.layout_list.append(self.ipadx)
+
+        self.ipadylbl = ct.CTkLabel(self.layout_frame, text = "ipady", font=ct.CTkFont(size=15, weight="bold"))
+        self.ipadylbl.grid(row = 2, column = 0, padx = 10, pady = 5)
+        self.ipady = ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
+        self.ipady.grid(row = 2, column = 1, padx = 10, pady = 5)
+        self.layout_list.append(self.ipady)
+
+        self.padxlbl = ct.CTkLabel(self.layout_frame, text = "padx", font=ct.CTkFont(size=15, weight="bold"))
+        self.padxlbl.grid(row = 3, column = 0, padx = 10, pady = 5)
+        self.padx = ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
+        self.padx.grid(row = 3, column = 1, padx = 10, pady = 5)
+        self.layout_list.append(self.padx)
+
+        self.padylbl = ct.CTkLabel(self.layout_frame, text = "pady", font=ct.CTkFont(size=15, weight="bold"))
+        self.padylbl.grid(row = 4, column = 0, padx = 10, pady = 5)
+        self.pady = ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
+        self.pady.grid(row = 4, column = 1, padx = 10, pady = 5)
+        self.layout_list.append(self.pady)
+
+        if value == "grid" :
+
+            self.columnlbl = ct.CTkLabel(self.layout_frame, text = "column", font=ct.CTkFont(size=15, weight="bold"))
+            self.columnlbl.grid(row = 5, column = 0, padx = 10, pady = 5)
+            self.column = ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
+            self.column.grid(row = 5, column = 1, padx = 10, pady = 5)
+            self.layout_list.append(self.column)
+
+            self.columnspanlbl = ct.CTkLabel(self.layout_frame, text = "columnspan", font=ct.CTkFont(size=15, weight="bold"))
+            self.columnspanlbl.grid(row = 6, column = 0, padx = 10, pady = 5)
+            self.columnspan= ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
+            self.columnspan.grid(row = 6, column = 1, padx = 10, pady = 5)
+            self.layout_list.append(self.columnspan)
+
+            self.rowlbl = ct.CTkLabel(self.layout_frame, text = "row", font=ct.CTkFont(size=15, weight="bold"))
+            self.rowlbl.grid(row = 7, column = 0, padx = 10, pady = 5)
+            self.row = ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
+            self.row.grid(row = 7, column = 1, padx = 10, pady = 5)
+            self.layout_list.append(self.row)
+
+            self.rowspanlbl = ct.CTkLabel(self.layout_frame, text = "rowspan", font=ct.CTkFont(size=15, weight="bold"))
+            self.rowspanlbl.grid(row = 8, column = 0, padx = 10, pady = 5)
+            self.rowspan = ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
+            self.rowspan.grid(row = 8, column = 1, padx = 10, pady = 5)
+            self.layout_list.append(self.rowspan)
+
+            self.stickylbl = ct.CTkLabel(self.layout_frame, text = "sticky", font=ct.CTkFont(size=15, weight="bold"))
+            self.stickylbl.grid(row = 9, column = 0, padx = 10, pady = 5)
+            self.sticky = ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
+            self.sticky.grid(row = 9, column = 1, padx = 10, pady = 5)
+            self.layout_list.append(self.sticky)
+
+        elif value == "pack" :
+            
+            self.afterlbl = ct.CTkLabel(self.layout_frame, text = "after", font=ct.CTkFont(size=15, weight="bold"))
+            self.afterlbl.grid(row = 5, column = 0, padx = 10, pady = 5)
+            self.afterentry = ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
+            self.afterentry.grid(row = 5, column = 1, padx = 10, pady = 5)
+            self.layout_list.append(self.afterentry)
+
+            self.anchorlbl = ct.CTkLabel(self.layout_frame, text = "anchor", font=ct.CTkFont(size=15, weight="bold"))
+            self.anchorlbl.grid(row = 6, column = 0, padx = 10, pady = 5)
+            self.anchorentry = ct.CTkOptionMenu(self.layout_frame, values = ["N", 'D', 'E', 'W'])
+            self.anchorentry.grid(row = 6, column = 1, padx = 10, pady = 5)
+            self.layout_list.append(self.anchorentry)
+
+            self.beforelbl = ct.CTkLabel(self.layout_frame, text = "before", font=ct.CTkFont(size=15, weight="bold"))
+            self.beforelbl.grid(row = 7, column = 0, padx = 10, pady = 5)
+            self.before = ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
+            self.before.grid(row = 7, column = 1, padx = 10, pady = 5)
+            self.layout_list.append(self.before)
+
+            self.expandlbl = ct.CTkLabel(self.layout_frame, text = "expand", font=ct.CTkFont(size=15, weight="bold"))
+            self.expandlbl.grid(row = 8, column = 0, padx = 10, pady = 5)
+            self.expand = ct.CTkSwitch(self.layout_frame, text = "", onvalue="1", offvalue="0", switch_width= 48,switch_height= 18)
+            self.expand.grid(row = 8, column = 1, padx = 10, pady = 5)
+            self.layout_list.append(self.expand)
+
+            self.filllbl = ct.CTkLabel(self.layout_frame, text = "fill", font=ct.CTkFont(size=15, weight="bold"))
+            self.filllbl.grid(row = 9, column = 0, padx = 10, pady = 5)
+            self.fill= ct.CTkOptionMenu(self.layout_frame, values = ["None", 'X', 'Y', 'BOTH'])
+            self.fill.grid(row = 9, column = 1, padx = 10, pady = 5)
+            self.layout_list.append(self.fill)
+
+            self.sidelbl = ct.CTkLabel(self.layout_frame, text = "side", font=ct.CTkFont(size=15, weight="bold"))
+            self.sidelbl.grid(row = 10, column = 0, padx = 10, pady = 5)
+            self.side= ct.CTkOptionMenu(self.layout_frame, values = ["Top", "BOTTOM", "LEFT", "RIGHT"])
+            self.side.grid(row = 10, column = 1, padx = 10, pady = 5)
+            self.layout_list.append(self.side)
+
+
 
 
     #-------------------- fonctions de gestions des évènements --------------------
@@ -225,6 +390,8 @@ class interface(ct.CTk):
             -all : détruit tous les widgets de l'interface ( frames comprises )
             -itemFrame : détruit les boutons associés aux widgets
             -sets : détruit les labels et entrées de paramètres d'un widget
+            -fontframe : détruit la frame des paramètres de font
+            -layoutframe : détruit la frame contenant les paramètres de layout du widget
         """
         if mod == 'all' :
             liste = self.grid_slaves() + self.pack_slaves()
@@ -242,6 +409,23 @@ class interface(ct.CTk):
             liste = self.edit_frame.grid_slaves()
             for element in liste :
                 element.destroy()
+        if mod == 'fontframe' :
+            try : 
+                liste = self.font_frame.grid_slaves()
+                for element in liste :
+                    element.destroy()
+                self.font_frame.destroy()
+            except :
+                pass
+        if mod == 'layoutframe' :
+            try : 
+                liste = self.layout_frame.grid_slaves()
+                for element in liste :
+                    element.destroy()
+                self.layout_frame.destroy()
+                self.layout_list = []
+            except :
+                pass
 
 
     def fLoadFunct(self, event : str, *dico : dict) -> Union[None, dict]:
@@ -283,6 +467,10 @@ class interface(ct.CTk):
         """
         dico = {}
         dico['ID'] = self.widget_id
+        if self.layout.get() != "" :
+            dico["layout"] = self.layout.get()
+        else :
+            messagebox.showerror("Méthode de layout incorrecte", "aucune méthode de layout sélectionné")
         #on vérifie que le nom de widget donné respecte les règles de typage pour une variable
         if interl.tryWN(self.widname.get()) == True :
             dico["name"] = self.widname.get() 
@@ -297,8 +485,7 @@ class interface(ct.CTk):
             if element[1] in ["width", "height"] :
                 dico[element[1]] = int(element[0].get())
             elif element[1] in ["font", "image"] :
-                if element[0].get() == "0" : dico[element[1]] = 'None'
-                else : dico[element[1]] = 'None' #à modifier ultérieurement
+                dico[element[1]] = element[0].get()
             elif element[1] == "hover" :
                 if element[0].get() == "0" : dico[element[1]] = "False"
                 else : dico[element[1]] = "True"

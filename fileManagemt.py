@@ -36,6 +36,7 @@ def cNWSF(widget, project):
     dico = {}
     dico["name"] = newname
     dico["ID"] = widget
+    dico["layout"] = None
     for values in sets["parameters"]:
         dico [values] = setvalues[values][0]
     fileop.cWSF(path, newname, dico)
@@ -55,6 +56,7 @@ def uWS(widid : str, widname : str, dico : dict, project : str) -> None:
     datasets = {}
     datasets["name"] = dico["name"]
     datasets["ID"] = dico["ID"]
+    datasets["layout"] = dico["layout"]
     sets = fileop.loadInfo(data = "widsets", widget = widid)
     setvalues = fileop.loadInfo(data = "setsinfo")
     for settings in sets["parameters"] :
