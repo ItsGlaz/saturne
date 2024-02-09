@@ -7,7 +7,6 @@
     "bg_color": ["transparent",1, "couleur de l'arrière plan"],
     "fg_color": ["None",1, "couleur du premier plan"],
     "border_color": ["None",2, "couleur de la bordure"],
-    "overwrite_preferred_drawing_method": ["None",3, ""],
     "text_color": ["None",2, "couleur du texte"],
     "text_color_disabled": ["None",2, "couleur du texte une fois le widget desactivé"],
     "text": ["",1, "texte à ajouter"],
