@@ -39,7 +39,7 @@ def cNWSF(widget, project):
     dico["layout"] = None
     for values in sets["parameters"]:
         dico [values] = setvalues[values][0]
-    fileop.cWSF(path, newname, dico)
+    fileop.cWSF(path, newname, [dico, {}, {}])
     return newname 
 
 
@@ -54,17 +54,17 @@ def uWS(widid : str, widname : str, dico : dict, project : str) -> None:
         _description_
     """
     datasets = {}
-    datasets["name"] = dico["name"]
-    datasets["ID"] = dico["ID"]
-    datasets["layout"] = dico["layout"]
+    datasets["name"] = dico[0]["name"]
+    datasets["ID"] = dico[0]["ID"]
+    datasets["layout"] = dico[0]["layout"]
     sets = fileop.loadInfo(data = "widsets", widget = widid)
     setvalues = fileop.loadInfo(data = "setsinfo")
     for settings in sets["parameters"] :
-        if settings in dico :
-            datasets[settings] = dico[settings]
+        if settings in dico[0] :
+            datasets[settings] = dico[0][settings]
         else :
             datasets[settings] = setvalues[settings][0]
     print(datasets)
     path = fileop.createPath(project)
     fileop.rmFile(path + "\\" + widname + '.json')
-    fileop.mWS(path, dico["name"], widname, datasets)
+    fileop.mWS(path, dico[0]["name"], widname, [datasets, dico[1], dico[2]])

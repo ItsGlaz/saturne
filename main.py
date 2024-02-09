@@ -138,15 +138,15 @@ class interface(ct.CTk):
         #on configue les boutons d'action pour les rendre actifs
         self.createActionBt()
         #on configure la disposition des paramètres selon la largeur de la fenêtre
-        self.column_num = 1 if self.width*(30/100) < 500 else 3
+        self.column_num = 1 if self.width*(30/100) < 525 else 3
         row = 2
         column = 0
         loading = True
 
         try :
             #on récupère les données du widget, les données associées à chaque paramètre, et les paramètre par défaut du widget
-            actualwidset = self.fLoadFunct("getWidSet")
-            self.widget_id = actualwidset["ID"]
+            self.actualwidset = self.fLoadFunct("getWidSet")
+            self.widget_id = self.actualwidset[0]["ID"]
             setsinfo = self.fLoadFunct("getSetsInfo")
             widsets = self.fLoadFunct("getWidInfo")
         except any as error :
@@ -162,18 +162,18 @@ class interface(ct.CTk):
                 self.settings_frame.grid( row = 1, column = 0, sticky = 'w')
 
                 #on crée le label titre, ainsi que l'entrée permettant de renseigner le nom du widget
-                self.overal_lbl = ct.CTkLabel(self.edit_frame, text = actualwidset["name"],font=ct.CTkFont(size=25, weight="bold"))
+                self.overal_lbl = ct.CTkLabel(self.edit_frame, text = self.actualwidset[0]["name"],font=ct.CTkFont(size=25, weight="bold"))
 
                 self.widnamelbl = ct.CTkLabel(self.settings_frame, text = "Nom du widget :",font=ct.CTkFont(size=15, weight="bold"))
                 self.widname = ct.CTkEntry(self.settings_frame, width= 150, height = 40,font=ct.CTkFont(weight="bold"))
                 tl.CreateToolTip(self.widnamelbl, "Nom du widget, attention ce nom sera aussi utilisé comme nom de variable dans le code.") if self.showtooltip == "Oui" else None
-                self.widname.insert(0, actualwidset["name"])
+                self.widname.insert(0, self.actualwidset[0]["name"])
 
                 self.overal_lbl.grid(column = 0, row = 0 , pady = 15, sticky = 'w')
                 self.widnamelbl.grid(row = 1, column = 0, columnspan = 2 if self.column_num == 3 else 1, 
                                      pady = 20, sticky = 'e')
                 self.widname.grid(row = 1, column = 2 if self.column_num == 3 else 1, 
-                                  columnspan = 2 if self.column_num == 3 else 1 , padx = 15, pady = 20)
+                                  columnspan = 2 if self.column_num == 3 else 1 , padx = 10, pady = 20)
                 
                 detail_dico = {"Simple" : (0,1), "Normal" : (1,2), "Complet" : (1,2,3)}
                 
@@ -181,21 +181,21 @@ class interface(ct.CTk):
                 for parameter in widsets["parameters"]:
                     
                     if setsinfo[parameter][1] in detail_dico[self.detail_lvl] :
-                        lbl = ct.CTkLabel(self.settings_frame, text = parameter + " :", font=ct.CTkFont(size=15, weight="bold"))
+                        lbl = ct.CTkLabel(self.settings_frame, text = parameter + " :", font=ct.CTkFont(size=12, weight="bold"))
                         
                         if parameter in ["font", "hover", "image"]:
                             entry = ct.CTkSwitch(self.settings_frame, text = "", onvalue="1", offvalue="0", switch_width= 48,switch_height= 18)
-                            entry.select() if actualwidset[parameter] == 1 else None
-                            self.fontvar= ct.StringVar(value = actualwidset[parameter])
+                            entry.select() if self.actualwidset[0][parameter] == '1' else None
+                            self.fontvar= ct.StringVar(value = self.actualwidset[0][parameter])
                             entry.configure(command = lambda : self.showFontFrame(), variable = self.fontvar) if parameter == "font" else None
                         
                         elif parameter in ["state", "anchor", "compound", "justify"]:
                             entry = ct.CTkOptionMenu(self.settings_frame, values = setsinfo[parameter][3])  
-                            entry.set(actualwidset[parameter])  
+                            entry.set(self.actualwidset[0][parameter])  
                         
                         else :
                             entry = ct.CTkEntry(self.settings_frame, width = 100,font=ct.CTkFont(weight="bold"))
-                            entry.insert(0, actualwidset[parameter])
+                            entry.insert(0, self.actualwidset[0][parameter])
                         self.actual_sets.append((entry, parameter))
                         tl.CreateToolTip(lbl, setsinfo[parameter][2]) if self.showtooltip == "Oui" else None
                         
@@ -209,13 +209,13 @@ class interface(ct.CTk):
 
                 self.layoutlbl = ct.CTkLabel(self.settings_frame, text = "affichage du widget : ", font=ct.CTkFont(size=15, weight="bold") )
                 self.layout = ct.CTkSegmentedButton(self.settings_frame, font=ct.CTkFont(size=15, weight="bold"), values = ["pack", "grid"], 
-                                                     command = self.showPackorGridFrame)
-                self.layout.set(actualwidset["layout"]) if actualwidset["layout"] != None else None
+                                                     command = self.showLayoutFrame)
+                self.layout.set(self.actualwidset[0]["layout"]) if self.actualwidset[0]["layout"] != None else None
                 self.layoutlbl.grid(row = row +1, column = 0)
                 self.layout.grid(row = row+1, column = 1)
 
                 self.showFontFrame() if self.fontvar.get() == "1" else None
-                self.showPackorGridFrame(self.layout.get()) if self.layout.get() != "" else None
+                self.showLayoutFrame(self.layout.get()) if self.layout.get() != "" else None
             except any as error :
                 print(error)
                 messagebox.showwarning("Erreur de chargement", "Une erreur est survenue lors de l'affichage des données")
@@ -251,12 +251,12 @@ class interface(ct.CTk):
             self.fontsize.grid(row = 2, column = 1, padx = 10, pady = 5)
 
             self.fontweightlbl = ct.CTkLabel(self.font_frame , text = "Weight : ", font=ct.CTkFont(size=15, weight="bold") )
-            self.fontweight = ct.CTkOptionMenu(self.font_frame, values = ["bold", "normal"])
+            self.fontweight = ct.CTkOptionMenu(self.font_frame, values = ["normal", "bold"])
             self.fontweightlbl.grid(row = 3, column = 0, padx = 10, pady = 5)
             self.fontweight.grid(row = 3, column = 1, padx = 10, pady = 5)
 
             self.slantlbl = ct.CTkLabel(self.font_frame , text = "Slant : ", font=ct.CTkFont(size=15, weight="bold") )
-            self.slant = ct.CTkOptionMenu(self.font_frame, values = ["italic", "roman"])
+            self.slant = ct.CTkOptionMenu(self.font_frame, values = ["roman", "italic"])
             self.slantlbl.grid(row = 4, column = 0, padx = 10, pady = 5)
             self.slant.grid(row = 4, column = 1, padx = 10, pady = 5)
 
@@ -270,8 +270,32 @@ class interface(ct.CTk):
             self.overstrikelbl.grid(row = 6, column = 0, padx = 10, pady = 5)
             self.overstrike.grid(row = 6, column = 1, padx = 10, pady = 5)
 
+            for keys, values in self.actualwidset[1].items():
+                match keys :
+                    case "family" :
+                        self.family.insert(0, values)
+                    case "size" :
+                        self.fontsize.insert(0, values)
+                    case "weight" :
+                        self.fontweight.set(values)
+                    case "slant" :
+                        self.slant.set(values)
+                    case "underline" :
+                        self.underline.toggle() if values == "1" else None
+                    case "overstrike" :
+                        self.overstrike.toggle() if values == "1" else None
 
-    def showPackorGridFrame(self, value):
+
+    def showLayoutFrame(self, value : str) -> None:
+        """showLayoutFrame 
+        crée l'encadré pour les paramètre de layout
+
+        Parameters
+        ----------
+        value : str
+            prend pour valeur le type de layout choisit ( pack ou grid )
+        """
+        self.layout_list = []
         self.clear("layoutframe")
         self.layout_frame = ct.CTkFrame(self.edit_frame, border_width = 3, border_color= '#FFFFFF')
         self.layout_frame.grid(column = 0, row =3, pady = 30, sticky = "w", ipadx = self.width*(7/100))
@@ -283,25 +307,25 @@ class interface(ct.CTk):
         self.ipadxlbl.grid(row = 1, column = 0, padx = 10, pady = 5)
         self.ipadx = ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
         self.ipadx.grid(row = 1, column = 1, padx = 10, pady = 5)
-        self.layout_list.append(self.ipadx)
+        self.layout_list.append(["ipadx",self.ipadx, ""])
 
         self.ipadylbl = ct.CTkLabel(self.layout_frame, text = "ipady", font=ct.CTkFont(size=15, weight="bold"))
         self.ipadylbl.grid(row = 2, column = 0, padx = 10, pady = 5)
         self.ipady = ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
         self.ipady.grid(row = 2, column = 1, padx = 10, pady = 5)
-        self.layout_list.append(self.ipady)
+        self.layout_list.append(["ipady",self.ipady, ""])
 
         self.padxlbl = ct.CTkLabel(self.layout_frame, text = "padx", font=ct.CTkFont(size=15, weight="bold"))
         self.padxlbl.grid(row = 3, column = 0, padx = 10, pady = 5)
         self.padx = ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
         self.padx.grid(row = 3, column = 1, padx = 10, pady = 5)
-        self.layout_list.append(self.padx)
+        self.layout_list.append(["padx",self.padx, ""])
 
         self.padylbl = ct.CTkLabel(self.layout_frame, text = "pady", font=ct.CTkFont(size=15, weight="bold"))
         self.padylbl.grid(row = 4, column = 0, padx = 10, pady = 5)
         self.pady = ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
         self.pady.grid(row = 4, column = 1, padx = 10, pady = 5)
-        self.layout_list.append(self.pady)
+        self.layout_list.append(["pady", self.pady, ""])
 
         if value == "grid" :
 
@@ -309,31 +333,31 @@ class interface(ct.CTk):
             self.columnlbl.grid(row = 5, column = 0, padx = 10, pady = 5)
             self.column = ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
             self.column.grid(row = 5, column = 1, padx = 10, pady = 5)
-            self.layout_list.append(self.column)
+            self.layout_list.append(["column", self.column, ""])
 
             self.columnspanlbl = ct.CTkLabel(self.layout_frame, text = "columnspan", font=ct.CTkFont(size=15, weight="bold"))
             self.columnspanlbl.grid(row = 6, column = 0, padx = 10, pady = 5)
             self.columnspan= ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
             self.columnspan.grid(row = 6, column = 1, padx = 10, pady = 5)
-            self.layout_list.append(self.columnspan)
+            self.layout_list.append(["columnspan", self.columnspan, ""])
 
             self.rowlbl = ct.CTkLabel(self.layout_frame, text = "row", font=ct.CTkFont(size=15, weight="bold"))
             self.rowlbl.grid(row = 7, column = 0, padx = 10, pady = 5)
             self.row = ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
             self.row.grid(row = 7, column = 1, padx = 10, pady = 5)
-            self.layout_list.append(self.row)
+            self.layout_list.append(["row", self.row, ""])
 
             self.rowspanlbl = ct.CTkLabel(self.layout_frame, text = "rowspan", font=ct.CTkFont(size=15, weight="bold"))
             self.rowspanlbl.grid(row = 8, column = 0, padx = 10, pady = 5)
             self.rowspan = ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
             self.rowspan.grid(row = 8, column = 1, padx = 10, pady = 5)
-            self.layout_list.append(self.rowspan)
+            self.layout_list.append(["rowspan", self.rowspan, ""])
 
             self.stickylbl = ct.CTkLabel(self.layout_frame, text = "sticky", font=ct.CTkFont(size=15, weight="bold"))
             self.stickylbl.grid(row = 9, column = 0, padx = 10, pady = 5)
-            self.sticky = ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
+            self.sticky = ct.CTkOptionMenu(self.layout_frame, values = ['W', "N", 'S', 'E'])
             self.sticky.grid(row = 9, column = 1, padx = 10, pady = 5)
-            self.layout_list.append(self.sticky)
+            self.layout_list.append(["sticky", self.sticky, "E"])
 
         elif value == "pack" :
             
@@ -341,37 +365,47 @@ class interface(ct.CTk):
             self.afterlbl.grid(row = 5, column = 0, padx = 10, pady = 5)
             self.afterentry = ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
             self.afterentry.grid(row = 5, column = 1, padx = 10, pady = 5)
-            self.layout_list.append(self.afterentry)
+            self.layout_list.append(["after", self.afterentry, ""])
 
             self.anchorlbl = ct.CTkLabel(self.layout_frame, text = "anchor", font=ct.CTkFont(size=15, weight="bold"))
             self.anchorlbl.grid(row = 6, column = 0, padx = 10, pady = 5)
-            self.anchorentry = ct.CTkOptionMenu(self.layout_frame, values = ["N", 'D', 'E', 'W'])
+            self.anchorentry = ct.CTkOptionMenu(self.layout_frame, values = ['W', "N", 'S', 'E'])
             self.anchorentry.grid(row = 6, column = 1, padx = 10, pady = 5)
-            self.layout_list.append(self.anchorentry)
+            self.layout_list.append(["anchor", self.anchorentry, 'W'])
 
             self.beforelbl = ct.CTkLabel(self.layout_frame, text = "before", font=ct.CTkFont(size=15, weight="bold"))
             self.beforelbl.grid(row = 7, column = 0, padx = 10, pady = 5)
             self.before = ct.CTkEntry(self.layout_frame, width = 100,font=ct.CTkFont(weight="bold"))
             self.before.grid(row = 7, column = 1, padx = 10, pady = 5)
-            self.layout_list.append(self.before)
+            self.layout_list.append(["before", self.before, ""])
 
             self.expandlbl = ct.CTkLabel(self.layout_frame, text = "expand", font=ct.CTkFont(size=15, weight="bold"))
             self.expandlbl.grid(row = 8, column = 0, padx = 10, pady = 5)
             self.expand = ct.CTkSwitch(self.layout_frame, text = "", onvalue="1", offvalue="0", switch_width= 48,switch_height= 18)
             self.expand.grid(row = 8, column = 1, padx = 10, pady = 5)
-            self.layout_list.append(self.expand)
+            self.layout_list.append(["expand", self.expand, "0"])
 
             self.filllbl = ct.CTkLabel(self.layout_frame, text = "fill", font=ct.CTkFont(size=15, weight="bold"))
             self.filllbl.grid(row = 9, column = 0, padx = 10, pady = 5)
             self.fill= ct.CTkOptionMenu(self.layout_frame, values = ["None", 'X', 'Y', 'BOTH'])
             self.fill.grid(row = 9, column = 1, padx = 10, pady = 5)
-            self.layout_list.append(self.fill)
+            self.layout_list.append(["fill", self.fill, "None"])
 
             self.sidelbl = ct.CTkLabel(self.layout_frame, text = "side", font=ct.CTkFont(size=15, weight="bold"))
             self.sidelbl.grid(row = 10, column = 0, padx = 10, pady = 5)
-            self.side= ct.CTkOptionMenu(self.layout_frame, values = ["Top", "BOTTOM", "LEFT", "RIGHT"])
+            self.side= ct.CTkOptionMenu(self.layout_frame, values = ["TOP", "BOTTOM", "LEFT", "RIGHT"])
             self.side.grid(row = 10, column = 1, padx = 10, pady = 5)
-            self.layout_list.append(self.side)
+            self.layout_list.append(["side", self.side, "TOP"])
+
+
+        for element in self.layout_list :
+            if element[0] in self.actualwidset[2].keys() :
+                if element[0] == "expand" :
+                    element[1].toggle() if self.actualwidset[2][element[0]] == "1" else None
+                elif element[0] in ("side", "fill", "sticky", "anchor"):
+                    element[1].set(self.actualwidset[2][element[0]])
+                else :
+                    element[1].insert(0, self.actualwidset[2][element[0]])
 
 
 
@@ -465,10 +499,15 @@ class interface(ct.CTk):
         fonction de modification des paramètres d'un widget,
         appele la fonction de chargement/envoi de données (fLoadFunct)
         """
+        layout_dico = {}
+        font_dico = {}
         dico = {}
         dico['ID'] = self.widget_id
         if self.layout.get() != "" :
             dico["layout"] = self.layout.get()
+            for element in self.layout_list :
+                if element[1].get() != element[2] :
+                    layout_dico[element[0]] = element[1].get()
         else :
             messagebox.showerror("Méthode de layout incorrecte", "aucune méthode de layout sélectionné")
         #on vérifie que le nom de widget donné respecte les règles de typage pour une variable
@@ -482,16 +521,36 @@ class interface(ct.CTk):
             self.widname.insert(0, self.actual_widget)
         
         for element in self.actual_sets :
+            
             if element[1] in ["width", "height"] :
                 dico[element[1]] = int(element[0].get())
-            elif element[1] in ["font", "image"] :
+            
+            elif element[1] == "font" :
                 dico[element[1]] = element[0].get()
+                if dico[element[1]] == "1" :
+                    if self.family.get() != "" :
+                        font_dico["family"] = self.family.get()
+                    if self.fontsize.get() != "" :
+                        font_dico["size"] = self.fontsize.get()
+                    if self.fontweight.get() != "normal" :
+                        font_dico["weight"] = self.fontweight.get()
+                    if self.slant.get() != "roman" :
+                        font_dico["slant"] = self.slant.get()
+                    if self.underline.get() != '0' :
+                        font_dico["underline"] = self.underline.get()
+                    if self.overstrike.get() != '0' :
+                        font_dico["overstrike"] = self.overstrike.get()
+                    if len(font_dico) == 0 :
+                        dico[element[1]] = '0'
+            
             elif element[1] == "hover" :
                 if element[0].get() == "0" : dico[element[1]] = "False"
                 else : dico[element[1]] = "True"
+            
             else : 
                 dico[element[1]] = element[0].get()
-        self.fLoadFunct("modifyWidSet", dico)
+        
+        self.fLoadFunct("modifyWidSet", [dico, font_dico, layout_dico])
         self.fLoadFunct("widnamelist")
         self.overal_lbl.configure(text = dico["name"])
         self.actual_widget = dico["name"]
@@ -577,6 +636,7 @@ class interface(ct.CTk):
             self.project_app = ProjectApp()
             self.project_app.grab_set()
             self.actual_project = self.project_app.closed()
+            print(self.actual_project)
             self.project_app = None
             if self.actual_project != None :
                 self.title(f"Saturne : {self.actual_project}")

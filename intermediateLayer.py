@@ -127,6 +127,7 @@ def getWidNameListReq(project : str) -> list:
         liste contenant le nom de chaque widget du projet
     """
     path = fileop.createPath(project)
+    print(path)
     return fileop.loadInfo(path, data = "widNameList")
 
 
@@ -169,7 +170,7 @@ def createWidSetFileReq(newwidget : str, project : str) -> str:
     return flmngt.cNWSF(newwidget, project)
 
 
-def modifyWidSetReq(widget : str, widname : str, dico : str, project : str) -> None:
+def modifyWidSetReq(widget : str, widname : str, dico : list, project : str) -> None:
     """modifyWidSetReq 
     Envoie une requête de modification des paramètres d'un widget créé par l'utilisateur
 
@@ -179,7 +180,7 @@ def modifyWidSetReq(widget : str, widname : str, dico : str, project : str) -> N
         identifiant du widget ( label, button etc)
     widname : str
         nom du widget ( donné par l'utilisateur/ par le programme)
-    dico : str
+    dico : list
         dictionnaire des paramètres du widget
     project : str
         nom du projet parent du widget
