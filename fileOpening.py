@@ -28,6 +28,29 @@ def dirCreation(name : str) -> None:
         print("error raised : ", error)
 
 
+def renameDir(oldname : str, newname : str ) -> bool :
+    """renameDir 
+    change le nom d'un dossier de projet
+
+    Parameters
+    ----------
+    oldname : str
+        ancien nom du projet
+    newname : str
+        nouveau nom du projet
+
+    Returns
+    -------
+    bool
+        renvoie True si le renommage est réussi, false sinon
+    """
+    try :
+        os.rename(os.path.join(os.getcwd(), oldname), os.path.join(os.getcwd(), newname))
+        return True
+    except any as error :
+        print(error)
+        return False
+
 def rmDirectory(name : str) -> None:
     """rmDirectory 
     fonction de suppression d'un dossier
@@ -163,7 +186,7 @@ def createPath(target : str) -> str:
     str
         retourne le chemin d'accès de la cible
     """
-    return os.getcwd() +"\\"+ target
+    return os.path.join(os.getcwd(), target)
 
 
 #-------------------------- Fonctions de gestion des fichiers des projets --------------------------
@@ -299,7 +322,7 @@ def verifyApp() -> Union[str, bool]:
     return True
 
 
-def loadInfo(path : str = None, data : str = 'prjctInfo', widget : str = None) -> Union[dict, list, None]:
+def loadInfo(path : str = None, data : str = 'prjctInfo') -> Union[dict, list, None]:
     """loadInfo _summary_
     Fonction de chargement des données des fichiers
 
@@ -315,8 +338,6 @@ def loadInfo(path : str = None, data : str = 'prjctInfo', widget : str = None) -
         -widNameList  : chargement de la liste des widget du projet selectionné
         -actualwidSet : chargement des données d'un widget créé par l'utilisateur
 
-    widget : str, optional
-        précise dans le cas de "widsets", le widget concerné, by default None
     Returns
     -------
     Union[dict, list, None]
@@ -330,7 +351,7 @@ def loadInfo(path : str = None, data : str = 'prjctInfo', widget : str = None) -
     if data == "widsets" :
         try : 
             with open('rssDir\widgetInfo.json', "r", encoding= 'utf8') as file:
-                return json.load(file)[widget]
+                return json.load(file)
         except :
             return None
     if data == 'setsinfo' :

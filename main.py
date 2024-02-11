@@ -24,12 +24,15 @@ class interface(ct.CTk):
         self.actual_widget = None
         self.actual_project = None
         self.widget_id = None
+        self.setsinfo = self.fLoadFunct("getsetsinfo")
+        self.widgetInfo = self.fLoadFunct("getWidInfo")
+
 
         self.getSettings()
         self.createInterface()
         if self.actual_widget != None :
             self.widgetParametersFrame(self.actual_widget)
-        self.openProjectApp()
+        self.openProjectApp(reason = "new")
 
 
     #-------------------- fonctions de création de la fenêtres --------------------
@@ -63,14 +66,16 @@ class interface(ct.CTk):
         self.config(menu=self.menubar)
 
         self.fichier = tk.Menu(self.menubar, tearoff = False)
-        self.fichier.add_command(label = "Ouvrir un projet", command = lambda x = None : self.openProjectApp(x))
+        self.application = tk.Menu(self.menubar, tearoff = False)
+        self.fichier.add_command(label = "Ouvrir un projet", command = lambda x = self.actual_project : self.openProjectApp(x))
         self.fichier.add_command(label = "Nouveau projet", command = lambda x = "new" : self.openProjectApp(x))
         self.fichier.add_separator()
-        self.fichier.add_command(label = "Enregistrer", command = lambda : None)
         self.fichier.add_command(label='Vérifier les fichiers', command = lambda : self.verifyFiles())
-        self.fichier.add_separator() 
-        self.fichier.add_command(label='Quitter', command = lambda : self.on_quit())
+        self.application.add_command(label = "Enregistrer", command = lambda : None)
+        self.application.add_command(label= "Recharger", command = lambda x = "all" : self.clear(x))
+        self.application.add_command(label='Quitter', command = lambda : self.on_quit())
         self.menubar.add_cascade(label = "fichiers", menu = self.fichier)
+        self.menubar.add_cascade(label = "Application", menu = self.application)
         
 
         #-------------------- création des widgets et des boutons d'actions --------------------
@@ -142,13 +147,11 @@ class interface(ct.CTk):
         row = 2
         column = 0
         loading = True
-
         try :
             #on récupère les données du widget, les données associées à chaque paramètre, et les paramètre par défaut du widget
             self.actualwidset = self.fLoadFunct("getWidSet")
             self.widget_id = self.actualwidset[0]["ID"]
-            setsinfo = self.fLoadFunct("getSetsInfo")
-            widsets = self.fLoadFunct("getWidInfo")
+            widsets = self.widgetInfo[self.widget_id]
         except any as error :
             print(error)
             loading = False
@@ -180,7 +183,7 @@ class interface(ct.CTk):
                 #on crée le reste des paramètres, selon le type ( soit une entrée texte, un menu, ou un switch)
                 for parameter in widsets["parameters"]:
                     
-                    if setsinfo[parameter][1] in detail_dico[self.detail_lvl] :
+                    if self.setsinfo[parameter][1] in detail_dico[self.detail_lvl] :
                         lbl = ct.CTkLabel(self.settings_frame, text = parameter + " :", font=ct.CTkFont(size=12, weight="bold"))
                         
                         if parameter in ["font", "hover", "image"]:
@@ -190,14 +193,14 @@ class interface(ct.CTk):
                             entry.configure(command = lambda : self.showFontFrame(), variable = self.fontvar) if parameter == "font" else None
                         
                         elif parameter in ["state", "anchor", "compound", "justify"]:
-                            entry = ct.CTkOptionMenu(self.settings_frame, values = setsinfo[parameter][3])  
+                            entry = ct.CTkOptionMenu(self.settings_frame, values = self.setsinfo[parameter][3])  
                             entry.set(self.actualwidset[0][parameter])  
                         
                         else :
                             entry = ct.CTkEntry(self.settings_frame, width = 100,font=ct.CTkFont(weight="bold"))
                             entry.insert(0, self.actualwidset[0][parameter])
                         self.actual_sets.append((entry, parameter))
-                        tl.CreateToolTip(lbl, setsinfo[parameter][2]) if self.showtooltip == "Oui" else None
+                        tl.CreateToolTip(lbl, self.setsinfo[parameter][2]) if self.showtooltip == "Oui" else None
                         
                         lbl.grid(row = row, column = column, padx = 5, pady = 10, sticky = 'n')
                         column = column + 1 if column < self.column_num else 0
@@ -242,31 +245,37 @@ class interface(ct.CTk):
 
             self.familylbl = ct.CTkLabel(self.font_frame , text = "Family : ", font=ct.CTkFont(size=15, weight="bold") )
             self.family = ct.CTkEntry(self.font_frame, width = 100,font=ct.CTkFont(weight="bold"))
+            tl.CreateToolTip(self.familylbl,"Nom de la police") if self.showtooltip == "Oui" else None
             self.familylbl.grid(row = 1, column = 0, padx = 10, pady = 5)
             self.family.grid(row = 1, column = 1, padx = 10, pady = 5)
 
             self.fontsizelbl = ct.CTkLabel(self.font_frame , text = "Size : ", font=ct.CTkFont(size=15, weight="bold") )
             self.fontsize =ct.CTkEntry(self.font_frame, width = 100,font=ct.CTkFont(weight="bold"))
+            tl.CreateToolTip(self.fontsizelbl,"Taille du texte") if self.showtooltip == "Oui" else None
             self.fontsizelbl.grid(row = 2, column = 0, padx = 10, pady = 5)
             self.fontsize.grid(row = 2, column = 1, padx = 10, pady = 5)
 
             self.fontweightlbl = ct.CTkLabel(self.font_frame , text = "Weight : ", font=ct.CTkFont(size=15, weight="bold") )
             self.fontweight = ct.CTkOptionMenu(self.font_frame, values = ["normal", "bold"])
+            tl.CreateToolTip(self.fontweightlbl,"Mise en Gras du texte ( bold ), normal sinon") if self.showtooltip == "Oui" else None
             self.fontweightlbl.grid(row = 3, column = 0, padx = 10, pady = 5)
             self.fontweight.grid(row = 3, column = 1, padx = 10, pady = 5)
 
             self.slantlbl = ct.CTkLabel(self.font_frame , text = "Slant : ", font=ct.CTkFont(size=15, weight="bold") )
             self.slant = ct.CTkOptionMenu(self.font_frame, values = ["roman", "italic"])
+            tl.CreateToolTip(self.slantlbl,"Mise en italique du texte ( italic), roman sinon") if self.showtooltip == "Oui" else None
             self.slantlbl.grid(row = 4, column = 0, padx = 10, pady = 5)
             self.slant.grid(row = 4, column = 1, padx = 10, pady = 5)
 
             self.underlinelbl = ct.CTkLabel(self.font_frame , text = "Underline : ", font=ct.CTkFont(size=15, weight="bold") )
             self.underline = ct.CTkSwitch(self.font_frame, text = "", onvalue="1", offvalue="0", switch_width= 48,switch_height= 18)
+            tl.CreateToolTip(self.underlinelbl,"Soulignage du texte") if self.showtooltip == "Oui" else None
             self.underlinelbl.grid(row = 5, column = 0, padx = 10, pady = 5)
             self.underline.grid(row = 5, column = 1, padx = 10, pady = 5)
     
             self.overstrikelbl = ct.CTkLabel(self.font_frame , text = "Overstrike : ", font=ct.CTkFont(size=15, weight="bold") )
             self.overstrike = ct.CTkSwitch(self.font_frame, text = "", onvalue="1", offvalue="0", switch_width= 48,switch_height= 18)
+            tl.CreateToolTip(self.overstrikelbl,"Raturage du texte") if self.showtooltip == "Oui" else None
             self.overstrikelbl.grid(row = 6, column = 0, padx = 10, pady = 5)
             self.overstrike.grid(row = 6, column = 1, padx = 10, pady = 5)
 
@@ -408,8 +417,6 @@ class interface(ct.CTk):
                     element[1].insert(0, self.actualwidset[2][element[0]])
 
 
-
-
     #-------------------- fonctions de gestions des évènements --------------------
                  
 
@@ -473,8 +480,8 @@ class interface(ct.CTk):
             -widnamelist : récupère la liste des widgets du projet, et actualise la frame des widget
             -getWidSet : récupère les données d'un widget ciblé            ( fichier "[nom du projet]\[nom du widget].json")
             -modifyWidSet : modifie les données d'un widget ciblé          ( fichier "[nom du projet]\[nom du widget].json")
-            -getSetsInfo : récupère les données des paramètres des widgets ( fichier "widParaInfo.json")
-            -getSetsInfo : récupères les données de base du widget ciblé   ( fichier "widgetInfo.json")
+            -getsetsinfo : récupère les données des paramètres des widgets ( fichier "widParaInfo.json")
+            -getWidInfo : récupères les données de base du widget ciblé    ( fichier "widgetInfo.json")
         Returns
         -------
         Union[None, dict]
@@ -488,10 +495,10 @@ class interface(ct.CTk):
             return interl.getWidSetReq(self.actual_widget, self.actual_project)
         if event == 'modifyWidSet' :
             interl.modifyWidSetReq(self.widget_id, self.actual_widget, dico[0], self.actual_project)
-        if event == "getSetsInfo" :
+        if event == "getsetsinfo" :
             return interl.getSetsInfoRqst()
         if event == "getWidInfo" :
-            return interl.getMainWidSetsRqst(self.widget_id)
+            return interl.getMainWidSetsRqst()
 
 
     def modifyWid(self) -> None:
@@ -510,6 +517,7 @@ class interface(ct.CTk):
                     layout_dico[element[0]] = element[1].get()
         else :
             messagebox.showerror("Méthode de layout incorrecte", "aucune méthode de layout sélectionné")
+            return 0
         #on vérifie que le nom de widget donné respecte les règles de typage pour une variable
         if interl.tryWN(self.widname.get()) == True :
             dico["name"] = self.widname.get() 
@@ -605,7 +613,7 @@ class interface(ct.CTk):
             self.actual_widget = None
 
 
-    def delWid(self):
+    def delWid(self) -> None:
         """delWid 
         Fonction de suppression d'un widget.
         """
@@ -614,11 +622,10 @@ class interface(ct.CTk):
         self.clear("sets")
         self.actual_widget = None
         self.widget_id = None
-        self.widgets_list = []
         self.createActionBt()
 
     
-    def on_quit(self):
+    def on_quit(self) -> None:
         """on_quit 
         Détruit la fenêtre lorsque le bouton "Quitter" du menu est pressé
         """
@@ -627,13 +634,13 @@ class interface(ct.CTk):
 #-------------------- fonctions de création de fenêtres enfant --------------------
     
 
-    def openProjectApp(self) -> None:
+    def openProjectApp(self, reason) -> None:
         """openProjectApp 
         Fonction d'ouverture de la fenêtre de projets,
         modifie le nom de l'application si un projet est ouvert
         """
         if self.project_app == None :
-            self.project_app = ProjectApp()
+            self.project_app = ProjectApp(reason)
             self.project_app.grab_set()
             self.actual_project = self.project_app.closed()
             print(self.actual_project)
@@ -665,7 +672,7 @@ class interface(ct.CTk):
             print("fenêtre de paramètres déjà ouverte")
 
 
-    def widgetAdding(self)  -> None:
+    def widgetAdding(self) -> None:
         """widgetAdding 
         Fonction d'ouverture de la fenêtre d'ajout de Widgets
         """
@@ -676,7 +683,6 @@ class interface(ct.CTk):
             if newwidget != None :
                 newwidget = interl.createWidSetFileReq(newwidget, self.actual_project)
                 self.widgets_list.append(newwidget)
-
             self.widgetapp = None
             self.sideWidgetsUptdating()
         else :
