@@ -42,6 +42,10 @@ def modidyPrjctRqst(name : str, dico : dict) -> None:
     flmngt.modifyPrjtInfo(name, dico)
 
 
+def renameDirReq(oldname : str, newname : str) -> bool:
+    return fileop.renameDir(oldname, newname)
+
+
 def getPrjtSetRqst(name : str) -> dict:
     """getPrjtSetRqst 
     Envoie une requête d'obtention des paramètres d'un projet
@@ -57,25 +61,19 @@ def getPrjtSetRqst(name : str) -> dict:
         paramètres du projet ciblé
     """
     path = fileop.createPath(name)
-    print(path)
     return fileop.loadInfo(path = path)
 
 
-def getMainWidSetsRqst(widget : str) -> dict:
+def getMainWidSetsRqst() -> dict:
     """getMainWidSetsRqst 
     Envoie une requête d'obtention des données par défaut d'un widget
-
-    Parameters
-    ----------
-    widget : str
-        widget ciblé
 
     Returns
     -------
     dict
         paramètres du widget ciblé
     """
-    return fileop.loadInfo(data = "widsets", widget = widget)
+    return fileop.loadInfo(data = "widsets")
 
 
 def getSetsInfoRqst() -> dict:

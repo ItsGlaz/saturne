@@ -3,7 +3,7 @@ import fileOpening as fileop
 
 def modifyPrjtInfo(name : str, newinfo : dict):
     get_path = fileop.createPath(name) +"\\"+ 'prjtset.json'
-    fileop.writeInfo(get_path, newinfo, "json")
+    fileop.mPS(get_path, newinfo)
 
 
 def cNWSF(widget, project):
@@ -21,7 +21,8 @@ def cNWSF(widget, project):
     _type_
         _description_
     """
-    sets = fileop.loadInfo(data = "widsets", widget = widget)
+    sets = fileop.loadInfo(data = "widsets")
+    sets = sets[widget]
     setvalues = fileop.loadInfo(data = "setsinfo")
 
     path = fileop.createPath(project)
@@ -57,7 +58,8 @@ def uWS(widid : str, widname : str, dico : dict, project : str) -> None:
     datasets["name"] = dico[0]["name"]
     datasets["ID"] = dico[0]["ID"]
     datasets["layout"] = dico[0]["layout"]
-    sets = fileop.loadInfo(data = "widsets", widget = widid)
+    sets = fileop.loadInfo(data = "widsets")
+    sets = sets[widid]
     setvalues = fileop.loadInfo(data = "setsinfo")
     for settings in sets["parameters"] :
         if settings in dico[0] :
