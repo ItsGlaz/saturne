@@ -110,8 +110,8 @@ class ProjectApp(ct.CTkToplevel):
         self.modify_bt.grid(row = 0, column = 1, padx = 10, pady = 10)
         self.open_bt.grid(row = 0, column = 2, padx = 10, pady = 10)
 
-        print(self.upper_frame.cget("width"), "-",self.lower_frame.cget("width"))
-        self.lower_frame.grid_configure(ipadx = (self.upper_frame.cget("width") - self.lower_frame.cget("width")))
+
+        self.work_frame.configure(bg_color = self.upper_frame.cget("bg_color"))
 
 
     def loadPrjctInfo(self):

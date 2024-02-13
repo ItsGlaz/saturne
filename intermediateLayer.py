@@ -200,6 +200,11 @@ def delWidReq(widget : str, project : str) -> None:
     fileop.rmWid(widget, project)
 
 
+def getCodeReq(project):
+    path = fileop.createPath(project + "\\" + "code.txt")
+    return fileop.loadInfo(path, data = "prjtCode")
+
+
 def tryWN(name : str) -> bool:
     """tryWN 
     Fonction de vérification de la validité d'un nom de widget entré,
@@ -229,7 +234,20 @@ def tryWN(name : str) -> bool:
     if name[0] in allowedchar[26:-2]:
         return False
     return True
-        
+
+
+def tryFont(family :str, family_list : str ) -> str :
+    #on récupère le
+    family = family.capitalize().strip()
+    if family + '\n' in family_list :
+        return family
+    else :
+        return False
+
+
+def getRssPath(rss):
+    return fileop.createPath("rssDir" + "\\" + rss)
+
 
 #possibilité de lancer le programme seul, à des fins de débogage
 if __name__ == "__main__" :
