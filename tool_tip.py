@@ -1,16 +1,21 @@
 # ToolTip widget based on this code : https://stackoverflow.com/a/56749167
 # Was modified to correspond to the color theme of our program.
 
+import json
 from tkinter import *
 from customtkinter import *
 
 class ToolTip(object):
+
 
     def __init__(self, widget):
         self.widget = widget
         self.tipwindow = None
         self.id = None
         self.x = self.y = 0
+        self.settings = self.loadsets()
+        set_default_color_theme(self.settings["color"])
+        set_appearance_mode(self.settings["theme"])
 
     def showtip(self, text):
         """
@@ -22,14 +27,13 @@ class ToolTip(object):
         x, y, cx, cy = self.widget.bbox("insert")
         x = x + self.widget.winfo_rootx() + 25
         y = y + cy + self.widget.winfo_rooty() +15
-        self.tipwindow = tw = Toplevel(self.widget)
+        self.tipwindow = tw = CTkToplevel(self.widget, highlightthickness=1, borderwidth = 2)
         tw.wm_overrideredirect(1)
         tw.attributes("-topmost", True)
         tw.wm_geometry("+%d+%d" % (x, y))
-        label = Label(tw, text=self.text, justify=LEFT, background="#3B3B3B", 
-                      font=("tahoma", "8", "normal"), 
-                      foreground="#ffffff", highlightthickness=1)
-        label.pack(ipadx=1)
+        label = CTkLabel(tw, text=self.text, justify=LEFT, height = 15,
+                      font=CTkFont(family = "Arial",size = 11,weight= "bold"))
+        label.pack(ipadx=5)
 
 
     def hidetip(self):
@@ -40,6 +44,21 @@ class ToolTip(object):
         self.tipwindow = None
         if tw:
             tw.destroy()
+
+
+    def loadsets(self):
+        """loadsets 
+        Function created for the sake of the saturn application,
+        load the settings of the application tu get the current theme settings
+
+        Returns
+        -------
+        _type_ : dict
+            return the settings of the interfaces
+        """
+        with open("rssDir" + "\\" + "wdSettings.json") as file :
+            return json.load(file)
+
 
 def CreateToolTip(widget, text):
     """

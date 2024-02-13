@@ -337,6 +337,7 @@ def loadInfo(path : str = None, data : str = 'prjctInfo') -> Union[dict, list, N
         -prjctInfo    : chargement des paramètres du projet selectionné
         -widNameList  : chargement de la liste des widget du projet selectionné
         -actualwidSet : chargement des données d'un widget créé par l'utilisateur
+        -prjtCode     : chargement du code du projet 
 
     Returns
     -------
@@ -379,6 +380,12 @@ def loadInfo(path : str = None, data : str = 'prjctInfo') -> Union[dict, list, N
         try :
             with open(path, 'r', encoding= 'utf8') as file :
                 return json.load(file)
+        except :
+            return None
+    if data == "prjtCode" :
+        try :
+            with open(path, "r", encoding= 'utf8') as file :
+                return file.read()
         except :
             return None
            

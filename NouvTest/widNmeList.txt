@@ -1,1 +1,1 @@
-,optionmenu1,optionmenu2,bt2,trt
+,optionmenu1,optionmenu2,bt2

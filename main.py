@@ -10,20 +10,30 @@ from settingsApp import AppEditing
 from widgetApp import WidgetApp
 from projectApp import ProjectApp
 
+
 class interface(ct.CTk):
+
 
     def __init__(self) -> None:
         super().__init__()
         
-        self.widgets_list = []
-        self.actual_sets = []
-        self.layout_list = []
-        self.settings = None
-        self.widgetapp = None
-        self.project_app = None
-        self.actual_widget = None
-        self.actual_project = None
-        self.widget_id = None
+        self.widgets_list = [] #liste des widgets existant dans le projet ouvert
+        self.actual_sets = [] #liste des paramètres utilisés dans l'application
+        self.layout_list = [] #liste contenant des paramètres de layout, comprenant pour chacun : leur nom, entrée associée, et valeur par défaut
+        self.settings = None # défini si la fenêtre de paramètre est ouverte ou non
+        self.widgetapp = None # défini si la fenêtre de widgets est ouverte ou non
+        self.project_app = None # défini si la fenêtre des projets est ouverte ou non
+        self.actual_widget = None #défini le widget ouverte à un instant T
+        self.actual_project = None # défini le projet ouverte
+        self.widget_id = None # défini l'ID du widget de self.actual_widget
+
+        self.tk_family_path = interl.getRssPath("tk_family.txt")
+        with open(self.tk_family_path, "r") as file :
+            self.tk_family = file.readlines()
+            for element in self.tk_family :
+                element.replace("\n", "")
+        file.close()
+
         self.setsinfo = self.fLoadFunct("getsetsinfo")
         self.widgetInfo = self.fLoadFunct("getWidInfo")
 
@@ -45,19 +55,18 @@ class interface(ct.CTk):
         #-------------------- création des frames --------------------
         
         
-        self.code_frame = ct.CTkFrame(self, width=self.width*(45/100), height=self.height, border_width=2, border_color="#000000")
+        self.code_frame = ct.CTkFrame(self, width=self.width*(45/100), height=self.height, border_color = "#000000", border_width= 2)
         self.edit_frame = ct.CTkScrollableFrame(self, width=self.width*(35/100), height=self.height*(90/100))
         self.actionbtframe = ct.CTkFrame(self, height = self.height*(10/100), width = self.width*(55/100))
-
         self.main_item_frame = ct.CTkScrollableFrame(self, height = self.height*(85/100), width = self.width*(18/100), label_text = "widgets :")
 
 
-        self.code_frame.grid(row =0, rowspan =2, column = 0)
+        self.code_frame.grid(row =0, rowspan =2, column = 0, ipadx = 15, sticky = "N")
         self.edit_frame.grid(row = 0, column = 1, sticky = "e")
         
         self.main_item_frame.grid(row = 0, column = 2, sticky = "e")
         self.actionbtframe.grid(row = 1,column =1, columnspan = 2 )
-
+        
 
         #-------------------- création du menu --------------------
 
@@ -67,30 +76,50 @@ class interface(ct.CTk):
 
         self.fichier = tk.Menu(self.menubar, tearoff = False)
         self.application = tk.Menu(self.menubar, tearoff = False)
+        self.widget_menu = tk.Menu(self.menubar, tearoff = False)
+        self.code_menu = tk.Menu(self.menubar, tearoff = False)
+        
         self.fichier.add_command(label = "Ouvrir un projet", command = lambda x = self.actual_project : self.openProjectApp(x))
         self.fichier.add_command(label = "Nouveau projet", command = lambda x = "new" : self.openProjectApp(x))
         self.fichier.add_separator()
         self.fichier.add_command(label='Vérifier les fichiers', command = lambda : self.verifyFiles())
-        self.application.add_command(label = "Enregistrer", command = lambda : None)
+        
         self.application.add_command(label= "Recharger", command = lambda x = "all" : self.clear(x))
+        self.application.add_command(label= "Paramètres", command = lambda : self.openParameters())
         self.application.add_command(label='Quitter', command = lambda : self.on_quit())
+
+        self.widget_menu.add_command(label='Ajouter un widget', command = lambda : self.widgetAdding())
+        self.widget_menu.add_command(label='Supprimer', command = lambda : self.delWid())
+        self.widget_menu.add_command(label='Modifier', command = lambda : self.modifyWid())
+        
+
+        self.code_menu.add_command(label='Copier le code', command = lambda : self.copyCode())
+        self.code_menu.add_command(label='Aperçu', command = lambda : self.openPreview())
+
+
         self.menubar.add_cascade(label = "fichiers", menu = self.fichier)
         self.menubar.add_cascade(label = "Application", menu = self.application)
+        self.menubar.add_cascade(label = "Widget", menu = self.widget_menu)
+        self.menubar.add_cascade(label = "Code", menu = self.code_menu)
         
 
         #-------------------- création des widgets et des boutons d'actions --------------------
 
 
-        self.createActionBt()
+        self.code_output = ct.CTkTextbox(self.code_frame, width=self.width*(40/100), height=self.height*(96/100)-20, activate_scrollbars=False)
+        self.code_scrollbar = ct.CTkScrollbar(self.code_frame, command=self.code_output.yview, height=self.height*(96/100)-20)
+        self.code_scrollbar.grid()
+        self.code_output.configure(yscrollcommand=self.code_scrollbar.set)
 
-        self.sideWidgetsUptdating()   
-            
+        self.copy_bt = ct.CTkButton(self.code_frame, width= self.width*(10/100), height= self.height*(4/100),
+                                    text = "Copier", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, 
+                                    command = lambda : self.copyCode())
+        self.preview_bt = ct.CTkButton(self.code_frame, width= self.width*(10/100), height= self.height*(4/100),
+                                       text = "Paramètres", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, 
+                                       command = lambda : self.openPreview())
 
-    def createActionBt(self) -> None:
-        """createActionBt 
-        fonction de création des boutons d'actions ( bouton de suppression et de modification de widget, et bouton d'ouverture des paramètres)
-        """
-        self.parameter_button = ct.CTkButton(self.actionbtframe,  width= self.width*(10/100), height= self.height*(6/100),
+
+        self.parameter_button = ct.CTkButton(self.actionbtframe, width= self.width*(10/100), height= self.height*(6/100),
                                              text = "paramètres", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : self.openParameters())
         tl.CreateToolTip(self.parameter_button, text = "Bouton d'ouverture de la fenêtre de paramètres.") if self.showtooltip == "Oui" else None
 
@@ -103,10 +132,28 @@ class interface(ct.CTk):
                                              text = "supprimer", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : self.delWid())
         tl.CreateToolTip(self.delete_button, text = "Bouton de suppression d'un widget.") if self.showtooltip == "Oui" else None
         self.delete_button.configure(state = "disabled") if self.actual_widget == None else None
+
+
+        self.code_output.grid(column =0, row = 0, pady = 5, padx = 10, columnspan = 2)
+        self.code_scrollbar.grid(column = 2, row = 0, padx = 10)
+
+        self.copy_bt.grid(row = 1, column = 1, padx = 10, pady = 5)
+        self.preview_bt.grid(row = 1, column = 0, padx = 10, pady = 5)
         
         self.delete_button.place(x = self.width*(5/200), y = self.height*(3/200))
         self.modify_button.place(x = self.width*(35/200), y = self.height*(3/200))
         self.parameter_button.place(x = self.width*(70/200), y = self.height*(3/200))
+
+        self.sideWidgetsUptdating()   
+        self.codeFrame() if self.actual_project != None else None
+            
+
+    def configActionBt(self) -> None:
+        """configActionBt 
+        fonction de modification de l'état des boutons de suppression et de sauvegarde des widgets 
+        """
+        self.modify_button.configure(state = "disabled") if self.actual_widget == None else self.modify_button.configure(state = "normal")
+        self.delete_button.configure(state = "disabled") if self.actual_widget == None else self.delete_button.configure(state = "normal")
 
 
     def sideWidgetsUptdating(self) -> None:
@@ -141,7 +188,7 @@ class interface(ct.CTk):
         self.actual_sets = []
         self.actual_widget = widget
         #on configue les boutons d'action pour les rendre actifs
-        self.createActionBt()
+        self.configActionBt()
         #on configure la disposition des paramètres selon la largeur de la fenêtre
         self.column_num = 1 if self.width*(30/100) < 525 else 3
         row = 2
@@ -226,7 +273,12 @@ class interface(ct.CTk):
 
     def codeFrame(self):
         #permet d'afficher le code de l'interface
-        pass
+        self.txt_code = interl.getCodeReq(self.actual_project)
+        if self.txt_code == None :
+            messagebox.showerror("Erreur d'affichage", "Une erreur est survenue lors de l'affichage du code.")
+            return
+        self.code_output.delete("0.0", "end")
+        self.code_output.insert("0.0", self.txt_code)
 
 
     def showFontFrame(self):
@@ -506,62 +558,91 @@ class interface(ct.CTk):
         fonction de modification des paramètres d'un widget,
         appele la fonction de chargement/envoi de données (fLoadFunct)
         """
-        layout_dico = {}
-        font_dico = {}
-        dico = {}
-        dico['ID'] = self.widget_id
-        if self.layout.get() != "" :
-            dico["layout"] = self.layout.get()
-            for element in self.layout_list :
-                if element[1].get() != element[2] :
-                    layout_dico[element[0]] = element[1].get()
-        else :
-            messagebox.showerror("Méthode de layout incorrecte", "aucune méthode de layout sélectionné")
-            return 0
-        #on vérifie que le nom de widget donné respecte les règles de typage pour une variable
-        if interl.tryWN(self.widname.get()) == True :
-            dico["name"] = self.widname.get() 
-        else :
-            messagebox.showerror("Nom de widget invalide", "Le nom du widget est invalide.")
-            dico["name"] = self.actual_widget
-            #on supprime le nom invalide dans l'entrée associée et le remplace par le précédent nom
-            self.widname.delete()
-            self.widname.insert(0, self.actual_widget)
-        
-        for element in self.actual_sets :
+        if self.actual_widget != None :
+            layout_dico = {}
+            font_dico = {}
+            dico = {}
+            dico['ID'] = self.widget_id
+
+            #vérification du layout et ajout dans le dictionnaire correspondant
+            if self.layout.get() != "" :
+                dico["layout"] = self.layout.get()
+                for element in self.layout_list :
+                    if element[1].get() != element[2] :
+                        if element[0] in ("column", "columnspan", "row", "rowspan") or (element[0] in ("ipadx", "ipady", "padx", "pady") and element[1].get() != "0") :
+                            try :
+                                layout_dico[element[0]] = int(element[1].get())
+                            except :
+                                messagebox.showerror("Erreur d'entrée", "Un mauvais nombre a été entré comme paramètre dans le layout")
+                        else : 
+                            layout_dico[element[0]] = element[1].get()
+            else :
+                messagebox.showerror("Erreur d'entrée", "Aucune méthode de layout sélectionné")
+                return 0
+            #on vérifie que le nom de widget donné respecte les règles de typage pour une variable
+            if interl.tryWN(self.widname.get()) == True :
+                dico["name"] = self.widname.get() 
+            else :
+                messagebox.showerror("Erreur d'entrée", "Le nom du widget est invalide.")
+                dico["name"] = self.actual_widget
+                #on supprime le nom invalide dans l'entrée associée et le remplace par le précédent nom
+                self.widname.delete()
+                self.widname.insert(0, self.actual_widget)
             
-            if element[1] in ["width", "height"] :
-                dico[element[1]] = int(element[0].get())
+            for element in self.actual_sets :
+                
+                if element[1] in ["width", "height"] :
+                    dico[element[1]] = int(element[0].get())
+                
+                #on s'occupe des paramètres de font
+                elif element[1] == "font" :
+                    dico[element[1]] = element[0].get()
+                    if dico[element[1]] == "1" :
+                        
+                        if self.family.get() != "" :
+                            family = interl.tryFont(self.family.get(), self.tk_family)
+                            if family == False :
+                                messagebox.showerror("Erreur d'entrée", "Mauvaise police d'écriture entrée,\nconsultez la console pour voir la liste des polices tolérées.")
+                                print("mauvaise police d'écriture entrée, liste des police tolérées :\n", self.tk_family_path)
+                                return 0
+                            else :
+                                font_dico["family"] = family
+                        
+                        if self.fontsize.get() != "" :
+                            try :
+                                font_dico["size"] = int(self.fontsize.get())
+                            except :
+                                messagebox.showerror("Erreur d'entrée", "Mauvaise taille de caractère entrée.")
+                                return 0
+                        
+                        if self.fontweight.get() != "normal" :
+                            font_dico["weight"] = self.fontweight.get()
+                        
+                        if self.slant.get() != "roman" :
+                            font_dico["slant"] = self.slant.get()
+                        
+                        if self.underline.get() != '0' :
+                            font_dico["underline"] = "True"
+                        
+                        if self.overstrike.get() != '0' :
+                            font_dico["overstrike"] = "True"
+                        #si aucun paramètre de font n'est utilisé, on met le paramètre font par défaut
+                        if len(font_dico) == 0 :
+                            dico[element[1]] = '0'
+                
+                elif element[1] == "hover" :
+                    if element[0].get() == "0" : dico[element[1]] = "False"
+                    else : dico[element[1]] = "True"
+                
+                else : 
+                    dico[element[1]] = element[0].get()
             
-            elif element[1] == "font" :
-                dico[element[1]] = element[0].get()
-                if dico[element[1]] == "1" :
-                    if self.family.get() != "" :
-                        font_dico["family"] = self.family.get()
-                    if self.fontsize.get() != "" :
-                        font_dico["size"] = self.fontsize.get()
-                    if self.fontweight.get() != "normal" :
-                        font_dico["weight"] = self.fontweight.get()
-                    if self.slant.get() != "roman" :
-                        font_dico["slant"] = self.slant.get()
-                    if self.underline.get() != '0' :
-                        font_dico["underline"] = self.underline.get()
-                    if self.overstrike.get() != '0' :
-                        font_dico["overstrike"] = self.overstrike.get()
-                    if len(font_dico) == 0 :
-                        dico[element[1]] = '0'
-            
-            elif element[1] == "hover" :
-                if element[0].get() == "0" : dico[element[1]] = "False"
-                else : dico[element[1]] = "True"
-            
-            else : 
-                dico[element[1]] = element[0].get()
-        
-        self.fLoadFunct("modifyWidSet", [dico, font_dico, layout_dico])
-        self.fLoadFunct("widnamelist")
-        self.overal_lbl.configure(text = dico["name"])
-        self.actual_widget = dico["name"]
+            self.fLoadFunct("modifyWidSet", [dico, font_dico, layout_dico])
+            self.fLoadFunct("widnamelist")
+            self.overal_lbl.configure(text = dico["name"])
+            self.actual_widget = dico["name"]
+        else : 
+            messagebox.showinfo("Utilisation impossible", "Modification impossible, aucun widget n'est ouvert.")
 
 
     def getSettings(self) -> None:
@@ -617,12 +698,16 @@ class interface(ct.CTk):
         """delWid 
         Fonction de suppression d'un widget.
         """
-        interl.delWidReq(self.actual_widget, self.actual_project)
-        self.fLoadFunct('widnamelist')
-        self.clear("sets")
-        self.actual_widget = None
-        self.widget_id = None
-        self.createActionBt()
+        if self.actual_widget != None :
+            interl.delWidReq(self.actual_widget, self.actual_project)
+            self.fLoadFunct('widnamelist')
+            self.clear("sets")
+            self.actual_sets = []
+            self.actual_widget = None
+            self.widget_id = None
+            self.configActionBt()
+        else :
+            messagebox.showinfo("Utilisation impossible", "Suppression impossible, aucun widget n'est ouvert.")
 
     
     def on_quit(self) -> None:
@@ -630,6 +715,16 @@ class interface(ct.CTk):
         Détruit la fenêtre lorsque le bouton "Quitter" du menu est pressé
         """
         self.destroy()
+
+
+    def copyCode(self):
+        self.clipboard_clear()
+        self.clipboard_append(self.code_output.get("0.0", "end"))
+
+
+    def openPreview(self):
+        pass
+
 
 #-------------------- fonctions de création de fenêtres enfant --------------------
     

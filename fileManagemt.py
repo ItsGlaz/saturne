@@ -66,7 +66,7 @@ def uWS(widid : str, widname : str, dico : dict, project : str) -> None:
             datasets[settings] = dico[0][settings]
         else :
             datasets[settings] = setvalues[settings][0]
-    print(datasets)
+    print(datasets, dico[1], dico[2])
     path = fileop.createPath(project)
     fileop.rmFile(path + "\\" + widname + '.json')
     fileop.mWS(path, dico[0]["name"], widname, [datasets, dico[1], dico[2]])
