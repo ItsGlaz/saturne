@@ -201,7 +201,7 @@ def delWidReq(widget : str, project : str) -> None:
 
 
 def getCodeReq(project):
-    path = fileop.createPath(project + "\\" + "code.txt")
+    path = fileop.createPath(project + "\\" + "code.py")
     return fileop.loadInfo(path, data = "prjtCode")
 
 
@@ -247,6 +247,10 @@ def tryFont(family :str, family_list : str ) -> str :
 
 def getRssPath(rss):
     return fileop.createPath("rssDir" + "\\" + rss)
+
+
+def getProjectPath(project):
+    return fileop.createPath(project)
 
 
 #possibilité de lancer le programme seul, à des fins de débogage

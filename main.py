@@ -115,7 +115,7 @@ class interface(ct.CTk):
                                     text = "Copier", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, 
                                     command = lambda : self.copyCode())
         self.preview_bt = ct.CTkButton(self.code_frame, width= self.width*(10/100), height= self.height*(4/100),
-                                       text = "Paramètres", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, 
+                                       text = "Aperçu", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, 
                                        command = lambda : self.openPreview())
 
 

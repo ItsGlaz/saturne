@@ -20,7 +20,7 @@ def dirCreation(name : str) -> None:
         os.mkdir(path)
         with open(path +"\\"+ 'prjtset.json', "w") as file :
             pass
-        with open(path +"\\"+ 'code.txt', "w") as file :
+        with open(path +"\\"+ 'code.py', "w") as file :
             pass
         with open(path +"\\"+ 'widNmeList.txt', "w") as file :
             pass
@@ -101,7 +101,7 @@ def verifyDir(name : str) -> bool:
     path = os.getcwd() +"\\"+ name
     if os.path.exists(path) :
         files = os.listdir(path)
-        if "code.txt" in files and "prjtset.json" in files and "widNmeList.txt" in files :
+        if "code.py" in files and "prjtset.json" in files and "widNmeList.txt" in files :
             return True
         else :
             addFiletoDir(path)
@@ -115,7 +115,7 @@ def verifyDir(path : str) -> bool:
     """
     if os.path.exists(path) :
         files = os.listdir(path)
-        if "code.txt" in files and "prjtset.json" in files and "widNmeList.txt" in files :
+        if "code.py" in files and "prjtset.json" in files and "widNmeList.txt" in files :
             return True
         else :
             addFiletoDir(path)
@@ -132,8 +132,8 @@ def addFiletoDir(path : str) -> None:
         chemin d'accès au dossier
     """
     files = os.listdir(path)
-    if "code.txt" not in files :
-        with open(path +"\\"+  'code.txt', "w") as file :
+    if "code.py" not in files :
+        with open(path +"\\"+  'code.py', "w") as file :
             pass
     if "prjtset.json" not in files :
         with open(path +"\\"+ 'prjtset.json', "w") as file :
@@ -386,7 +386,8 @@ def loadInfo(path : str = None, data : str = 'prjctInfo') -> Union[dict, list, N
         try :
             with open(path, "r", encoding= 'utf8') as file :
                 return file.read()
-        except :
+        except any as error :
+            print(error)
             return None
            
 
