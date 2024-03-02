@@ -723,7 +723,12 @@ class interface(ct.CTk):
 
 
     def openPreview(self):
-        pass
+        document = interl.getProjectPath(self.actual_project) + "\code.py"
+        with open(document,"r")as file:
+            code = file.read()
+            code = code + "\nf.mainloop()"
+            exec(code)
+        
 
 
 #-------------------- fonctions de création de fenêtres enfant --------------------
