@@ -5,11 +5,13 @@ import fileOpening as fileop
 def mWinCode(old_data, data, project_path):
         code_dico = fileop.loadInfo(project_path, data = "prjtCodeList")
         try :
-            if data["WinName"] != "" and data["WinName"] != old_data["WinName"] and f"window.title('{old_data["WinName"]}')\n" not in code_dico :
+            if data["WinName"] != "":
+                if f"window.title('{old_data["WinName"]}')\n" in code_dico :
+                    del code_dico[code_dico.index(f"window.title('{old_data["WinName"]}')\n")]
                 code_dico.insert(5, f"window.title('{data["WinName"]}')\n")
-            elif f"window.title('{old_data["WinName"]}')\n" in code_dico :
-                del code_dico[code_dico.index(f"window.title('{old_data["WinName"]}')\n")]
-                code_dico.insert(5, f"window.title('{data["WinName"]}')\n")
+            else :
+                del code_dico[code_dico.index(f"window.title('{old_data["WinName"]}')\n")] 
+            print("okgen")
         except :
             pass
         

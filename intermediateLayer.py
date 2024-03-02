@@ -1,6 +1,7 @@
 #fichier gérant les interactions entre l'interface et les fichiers fonctionnels
 import fileOpening as fileop
 import fileManagemt as flmngt
+import codeGen
 from typing import *
 
 def newPrjctRqst(name : str) -> None: 
@@ -39,6 +40,11 @@ def modidyPrjctRqst(name : str, dico : dict) -> None:
     dico : dict
         dictionnaire des paramètres du projet
     """
+    path = fileop.createPath(name)
+    old_data = fileop.loadInfo(path)
+    path = fileop.createPath(name + "\\" + "code.py")
+    code = codeGen.mWinCode( old_data, dico, path)
+    fileop.wCode(name, code)
     flmngt.modifyPrjtInfo(name, dico)
 
 
@@ -183,10 +189,15 @@ def modifyWidSetReq(widget : str, widname : str, dico : list, project : str) -> 
     project : str
         nom du projet parent du widget
     """
+    path = fileop.createPath(project+ "\\" + widname + ".json")
+    old_data = fileop.loadInfo(path, data = "actualwidSet")
+    path = fileop.createPath(project + "\\" + "code.py")
+    code = codeGen.mWidCode( old_data, dico, path)
+    fileop.wCode(project, code)
     flmngt.uWS(widget,widname, dico, project)
 
 
-def delWidReq(widget : str, project : str) -> None:
+def delWidReq(widget : str, wid_id : str, project : str) -> None:
     """delWidReq 
     Envoie une requête de suppression des données d'un widget
 
@@ -197,6 +208,9 @@ def delWidReq(widget : str, project : str) -> None:
     project : str
         nom du projet parent du widget
     """
+    path = fileop.createPath(project + "\\" + "code.py")
+    code = codeGen.delWidCode( widget, wid_id, path)
+    fileop.wCode(project, code)
     fileop.rmWid(widget, project)
 
 

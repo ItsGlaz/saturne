@@ -264,7 +264,8 @@ class interface(ct.CTk):
                 self.layoutlbl.grid(row = row +1, column = 0)
                 self.layout.grid(row = row+1, column = 1)
 
-                self.showFontFrame() if self.fontvar.get() == "1" else None
+                try : self.showFontFrame() if self.fontvar.get() == "1" else None
+                except : pass
                 self.showLayoutFrame(self.layout.get()) if self.layout.get() != "" else None
             except any as error :
                 print(error)
@@ -641,6 +642,7 @@ class interface(ct.CTk):
             self.fLoadFunct("widnamelist")
             self.overal_lbl.configure(text = dico["name"])
             self.actual_widget = dico["name"]
+            self.codeFrame()
         else : 
             messagebox.showinfo("Utilisation impossible", "Modification impossible, aucun widget n'est ouvert.")
 
@@ -699,13 +701,14 @@ class interface(ct.CTk):
         Fonction de suppression d'un widget.
         """
         if self.actual_widget != None :
-            interl.delWidReq(self.actual_widget, self.actual_project)
+            interl.delWidReq(self.actual_widget,self.widget_id, self.actual_project)
             self.fLoadFunct('widnamelist')
             self.clear("sets")
             self.actual_sets = []
             self.actual_widget = None
             self.widget_id = None
             self.configActionBt()
+            self.codeFrame()
         else :
             messagebox.showinfo("Utilisation impossible", "Suppression impossible, aucun widget n'est ouvert.")
 
@@ -718,8 +721,10 @@ class interface(ct.CTk):
 
 
     def copyCode(self):
+        code = self.code_output.get("0.0", "end")
+        code += "\n\nwindow.mainloop()"
         self.clipboard_clear()
-        self.clipboard_append(self.code_output.get("0.0", "end"))
+        self.clipboard_append(code)
 
 
     def openPreview(self):
