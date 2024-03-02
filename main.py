@@ -641,6 +641,7 @@ class interface(ct.CTk):
             self.fLoadFunct("widnamelist")
             self.overal_lbl.configure(text = dico["name"])
             self.actual_widget = dico["name"]
+            self.codeFrame()
         else : 
             messagebox.showinfo("Utilisation impossible", "Modification impossible, aucun widget n'est ouvert.")
 
@@ -699,7 +700,7 @@ class interface(ct.CTk):
         Fonction de suppression d'un widget.
         """
         if self.actual_widget != None :
-            interl.delWidReq(self.actual_widget, self.actual_project)
+            interl.delWidReq(self.actual_widget,self.widget_id, self.actual_project)
             self.fLoadFunct('widnamelist')
             self.clear("sets")
             self.actual_sets = []
