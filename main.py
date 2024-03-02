@@ -726,7 +726,7 @@ class interface(ct.CTk):
         document = interl.getProjectPath(self.actual_project) + "\code.py"
         with open(document,"r")as file:
             code = file.read()
-            code = code + "\nf.mainloop()"
+            code = code + "\nwindow.mainloop()"
             exec(code)
         
 
