@@ -389,6 +389,30 @@ def loadInfo(path : str = None, data : str = 'prjctInfo') -> Union[dict, list, N
         except any as error :
             print(error)
             return None
+    if data == "prjtCodeList" :
+        try :
+            with open(path, "r", encoding= 'utf8') as file :
+                return file.readlines()
+        except any as error :
+            print(error)
+            return None
+        
+
+def wCode(project, code):
+    """wCode 
+    écrase le code d'un projet par le nouveau
+
+    Parameters
+    ----------
+    project : _type_
+        _description_
+    code : _type_
+        _description_
+    """
+    path = createPath(project + "\\" + "code.py")
+    with open(path, "w", encoding= 'utf8') as file :
+        file.writelines(code)
+    file.close()
            
 
 if __name__ == "__main__" :
