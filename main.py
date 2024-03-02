@@ -61,7 +61,7 @@ class interface(ct.CTk):
         self.main_item_frame = ct.CTkScrollableFrame(self, height = self.height*(85/100), width = self.width*(18/100), label_text = "widgets :")
 
 
-        self.code_frame.grid(row =0, rowspan =2, column = 0, ipadx = 15, sticky = "N")
+        self.code_frame.grid(row =0, rowspan =2, column = 0, ipadx = 10, sticky = "N")
         self.edit_frame.grid(row = 0, column = 1, sticky = "e")
         
         self.main_item_frame.grid(row = 0, column = 2, sticky = "e")
@@ -115,7 +115,7 @@ class interface(ct.CTk):
                                     text = "Copier", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, 
                                     command = lambda : self.copyCode())
         self.preview_bt = ct.CTkButton(self.code_frame, width= self.width*(10/100), height= self.height*(4/100),
-                                       text = "Paramètres", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, 
+                                       text = "Aperçu", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, 
                                        command = lambda : self.openPreview())
 
 
