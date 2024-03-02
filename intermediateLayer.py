@@ -1,7 +1,7 @@
 #fichier gérant les interactions entre l'interface et les fichiers fonctionnels
 import fileOpening as fileop
 import fileManagemt as flmngt
-import codeGen
+import codeGen 
 from typing import *
 
 def newPrjctRqst(name : str) -> None: 
