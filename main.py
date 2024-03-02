@@ -61,7 +61,7 @@ class interface(ct.CTk):
         self.main_item_frame = ct.CTkScrollableFrame(self, height = self.height*(85/100), width = self.width*(18/100), label_text = "widgets :")
 
 
-        self.code_frame.grid(row =0, rowspan =2, column = 0, ipadx = 15, sticky = "N")
+        self.code_frame.grid(row =0, rowspan =2, column = 0, ipadx = 10, sticky = "N")
         self.edit_frame.grid(row = 0, column = 1, sticky = "e")
         
         self.main_item_frame.grid(row = 0, column = 2, sticky = "e")
