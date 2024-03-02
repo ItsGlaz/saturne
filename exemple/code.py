@@ -7,6 +7,7 @@ window.title('test')
 
 
 
+
 frame1 = customtkinter.CTkFrame(window)
 frame1.pack()
 
