@@ -5,11 +5,11 @@ window = customtkinter.CTk()
 
 
 
-optionmenu = customtkinter.CTkOptionMenu(window, values = ["value 1","value 2"])
-optionmenu.pack(padx = 15 ,pady = 15 )
 
 
 
 
 
+optionmenu1 = customtkinter.CTkOptionMenu(window, values = ["value1","value2"], command = lambda : commande(parametre))
+optionmenu1.grid(sticky = 'W' )
 

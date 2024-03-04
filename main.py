@@ -251,13 +251,16 @@ class interface(ct.CTk):
                             entry.set(self.actualwidset[0][parameter])  
 
                         elif parameter == "text":
-                            print(self.actualwidset[0][parameter])
-                            entry = ct.CTkButton(self.settings_frame, text = "Ajouter", command = lambda : self.openTextTopLevel(self.actualwidset[0]["text"] ))
-                            self.text = ""
+                            entry = ct.CTkButton(self.settings_frame, text = "Ajouter", command = lambda : self.openTextTopLevel(self.actualwidset[0]["text"]))
+                            self.text = self.actualwidset[0]["text"]
                         
                         elif parameter == "values" :
-                            entry = ct.CTkButton(self.settings_frame, text = "Ajouter", command = lambda : self.openValuesTopLevel(self.actualwidset[0]["values"] ))
-                            self.values = []
+                            entry = ct.CTkButton(self.settings_frame, text = "Ajouter", command = lambda : self.openValuesTopLevel(self.actualwidset[0]["values"]))
+                            self.values = self.actualwidset[0]["values"]
+
+                        elif parameter == "command" :
+                            entry = ct.CTkButton(self.settings_frame, text = "Ajouter", command = lambda : self.openCommandTopLevel(self.actualwidset[0]["command"]))
+                            self.command = self.actualwidset[0]["command"]
                         
                         else :
                             entry = ct.CTkEntry(self.settings_frame, width = 100,font=ct.CTkFont(weight="bold"))
@@ -657,7 +660,10 @@ class interface(ct.CTk):
 
                 elif element[1] == "values":
                     dico[element[1]] = self.values
-                
+
+                elif element[1] == "command" :
+                    dico[element[1]] = self.command
+
                 else : 
                     dico[element[1]] = element[0].get()
             
@@ -775,6 +781,15 @@ class interface(ct.CTk):
         self.app = ValuesTopLevelWin(values = values) if type(values) == list else ValuesTopLevelWin()
         self.app.grab_set()
         self.values = self.actualwidset[0]["values"] = self.app.contentGet()
+        self.app = None
+
+
+    def openCommandTopLevel(self, command):
+        if self.app != None :
+            return
+        self.app = CommandTopLevelWin(command = command)
+        self.app.grab_set()
+        self.command = self.actualwidset[0]["command"] = self.app.contentGet()
         self.app = None
 
 
