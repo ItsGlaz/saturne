@@ -34,6 +34,7 @@ def createWidCode(data : dict):
              "compound", "anchor", "hover_color", "checkmark_color", "state"
             "button_color", "button_hover_color", "dropdown_fg_color", "dropdown_hover_color"
             "dropdown_text_color", "placeholder_text_color", "background_corner_colors"]
+        
         widsets =  fileop.loadInfo(data = "setsinfo")
         widinfo = fileop.loadInfo(data = "widsets")
         init_seq = data[0]["name"] + " = " + widinfo[data[0]["ID"]]["tkid"]+ "(" + data[0]["master"]
@@ -41,7 +42,7 @@ def createWidCode(data : dict):
             if keys in ["name", "ID", "layout", "master"]:
                 pass
             elif keys == "text" :
-                init_seq += f", {keys} = '{values}'"
+                init_seq += f", {keys} = \"{values}\""
             elif values != widsets[keys][0] and keys != "text": 
                 if keys == "font" and values != "0":
                     font = "customtkinter.CTkFont("
@@ -57,7 +58,11 @@ def createWidCode(data : dict):
                     if keys in str_sets:
                         init_seq += f", {keys} = '{values}'"
                     elif keys == "values" :
-                        init_seq += f", {keys} = [{values}]"
+                        sub_seq = "["
+                        for element in values :
+                            sub_seq += f"\"{element}\","
+                        sub_seq = sub_seq[:-1] + "]"
+                        init_seq += f", {keys} = {sub_seq}"
                     else :
                         init_seq += f", {keys} = {values}"
         init_seq += ')\n'

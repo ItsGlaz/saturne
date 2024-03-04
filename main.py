@@ -9,6 +9,7 @@ import intermediateLayer as interl
 from settingsApp import AppEditing
 from widgetApp import WidgetApp
 from projectApp import ProjectApp
+from topLevelWin import *
 
 
 class interface(ct.CTk):
@@ -26,6 +27,7 @@ class interface(ct.CTk):
         self.actual_widget = None #défini le widget ouverte à un instant T
         self.actual_project = None # défini le projet ouverte
         self.widget_id = None # défini l'ID du widget de self.actual_widget
+        self.app = None
 
         self.tk_family_path = interl.getRssPath("tk_family.txt")
         with open(self.tk_family_path, "r") as file :
@@ -184,6 +186,8 @@ class interface(ct.CTk):
         widget : str
             widget dont la fonction doit afficher les paramètres, et leurx valeurs respectives
         """
+        if self.app != None :
+            return
         self.clear("sets")
         self.actual_sets = []
         self.actual_widget = widget
@@ -236,12 +240,24 @@ class interface(ct.CTk):
                         if parameter in ["font", "hover", "image"]:
                             entry = ct.CTkSwitch(self.settings_frame, text = "", onvalue="1", offvalue="0", switch_width= 48,switch_height= 18)
                             entry.select() if self.actualwidset[0][parameter] == '1' else None
-                            self.fontvar= ct.StringVar(value = self.actualwidset[0][parameter])
-                            entry.configure(command = lambda : self.showFontFrame(), variable = self.fontvar) if parameter == "font" else None
+                            if parameter == "font" : 
+                                print("passed")
+                                try : self.fontvar= ct.StringVar(value = self.actualwidset[0][parameter])
+                                except : self.fontvar = ct.StringVar(value = "0")
+                                entry.configure(command = lambda : self.showFontFrame(), variable = self.fontvar)
                         
                         elif parameter in ["state", "anchor", "compound", "justify"]:
                             entry = ct.CTkOptionMenu(self.settings_frame, values = self.setsinfo[parameter][3])  
                             entry.set(self.actualwidset[0][parameter])  
+
+                        elif parameter == "text":
+                            print(self.actualwidset[0][parameter])
+                            entry = ct.CTkButton(self.settings_frame, text = "Ajouter", command = lambda : self.openTextTopLevel(self.actualwidset[0]["text"] ))
+                            self.text = ""
+                        
+                        elif parameter == "values" :
+                            entry = ct.CTkButton(self.settings_frame, text = "Ajouter", command = lambda : self.openValuesTopLevel(self.actualwidset[0]["values"] ))
+                            self.values = []
                         
                         else :
                             entry = ct.CTkEntry(self.settings_frame, width = 100,font=ct.CTkFont(weight="bold"))
@@ -634,6 +650,13 @@ class interface(ct.CTk):
                 elif element[1] == "hover" :
                     if element[0].get() == "0" : dico[element[1]] = "False"
                     else : dico[element[1]] = "True"
+
+                elif element[1] == "text":
+                    self.text.replace("\'", "\\\'").replace("\"", "\\\"")
+                    dico[element[1]] = self.text
+
+                elif element[1] == "values":
+                    dico[element[1]] = self.values
                 
                 else : 
                     dico[element[1]] = element[0].get()
@@ -700,6 +723,8 @@ class interface(ct.CTk):
         """delWid 
         Fonction de suppression d'un widget.
         """
+        if self.app != None :
+            return
         if self.actual_widget != None :
             interl.delWidReq(self.actual_widget,self.widget_id, self.actual_project)
             self.fLoadFunct('widnamelist')
@@ -735,6 +760,23 @@ class interface(ct.CTk):
             exec(code)
         
 
+    def openTextTopLevel(self, text):
+        if self.app != None :
+            return
+        self.app = TextTopLevelWin(text = text)
+        self.app.grab_set()
+        self.text = self.actualwidset[0]["text"] = self.app.contentGet()
+        self.app = None
+
+
+    def openValuesTopLevel(self, values):
+        if self.app != None :
+            return
+        self.app = ValuesTopLevelWin(values = values) if type(values) == list else ValuesTopLevelWin()
+        self.app.grab_set()
+        self.values = self.actualwidset[0]["values"] = self.app.contentGet()
+        self.app = None
+
 
 #-------------------- fonctions de création de fenêtres enfant --------------------
     
@@ -744,20 +786,18 @@ class interface(ct.CTk):
         Fonction d'ouverture de la fenêtre de projets,
         modifie le nom de l'application si un projet est ouvert
         """
-        if self.project_app == None :
-            self.project_app = ProjectApp(reason)
-            self.project_app.grab_set()
-            self.actual_project = self.project_app.closed()
-            print(self.actual_project)
-            self.project_app = None
-            if self.actual_project != None :
-                self.title(f"Saturne : {self.actual_project}")
-                self.fLoadFunct(event = "widnamelist")
-            else :
-                self.title("Saturne")
-                self.resetAttr()
+        if self.project_app != None :
+            return
+        self.project_app = ProjectApp(reason)
+        self.project_app.grab_set()
+        self.actual_project = self.project_app.closed()
+        self.project_app = None
+        if self.actual_project != None :
+            self.title(f"Saturne : {self.actual_project}")
+            self.fLoadFunct(event = "widnamelist")
         else :
-            print("fenêtre de projets déjà ouverte")
+            self.title("Saturne")
+            self.resetAttr()
         self.clear('all')
 
 
@@ -766,15 +806,14 @@ class interface(ct.CTk):
         fonction d'ouverture des paramètres, 
         appele la fonction "getSettings" à l'issue
         """
-        if self.settings == None :
-            self.settings = AppEditing(self.parameters)
-            self.settings.grab_set()
-            self.parameters = self.settings.get()
-            self.settings = None
-            self.getSettings()
-            self.clear('all')
-        else :
-            print("fenêtre de paramètres déjà ouverte")
+        if self.settings != None :
+            return 
+        self.settings = AppEditing(self.parameters)
+        self.settings.grab_set()
+        self.parameters = self.settings.get()
+        self.settings = None
+        self.getSettings()
+        self.clear('all')
 
 
     def widgetAdding(self) -> None:
