@@ -21,6 +21,7 @@ class interface(ct.CTk):
         self.widgets_list = [] #liste des widgets existant dans le projet ouvert
         self.actual_sets = [] #liste des paramètres utilisés dans l'application
         self.layout_list = [] #liste contenant des paramètres de layout, comprenant pour chacun : leur nom, entrée associée, et valeur par défaut
+        self.language_dict = {}
         self.settings = None # défini si la fenêtre de paramètre est ouverte ou non
         self.widgetapp = None # défini si la fenêtre de widgets est ouverte ou non
         self.project_app = None # défini si la fenêtre des projets est ouverte ou non
@@ -29,11 +30,15 @@ class interface(ct.CTk):
         self.widget_id = None # défini l'ID du widget de self.actual_widget
         self.app = None
 
-        self.tk_family_path = interl.getRssPath("tk_family.txt")
-        with open(self.tk_family_path, "r") as file :
+        tk_family_path = interl.getRssPath("tk_family.txt")
+        with open(tk_family_path, "r", encoding='utf8') as file :
             self.tk_family = file.readlines()
             for element in self.tk_family :
                 element.replace("\n", "")
+        file.close()
+        language_dict_path = interl.getRssPath("languageDict.json")
+        with open(language_dict_path, 'r', encoding='utf8') as file :
+            self.language_dict = json.load(file)
         file.close()
 
         self.setsinfo = self.fLoadFunct("getsetsinfo")
@@ -81,28 +86,28 @@ class interface(ct.CTk):
         self.widget_menu = tk.Menu(self.menubar, tearoff = False)
         self.code_menu = tk.Menu(self.menubar, tearoff = False)
         
-        self.fichier.add_command(label = "Ouvrir un projet", command = lambda x = self.actual_project : self.openProjectApp(x))
-        self.fichier.add_command(label = "Nouveau projet", command = lambda x = "new" : self.openProjectApp(x))
+        self.fichier.add_command(label = self.language_dict["menufile1"][self.int_lang], command = lambda x = self.actual_project : self.openProjectApp(x))
+        self.fichier.add_command(label = self.language_dict["menufile2"][self.int_lang], command = lambda x = "new" : self.openProjectApp(x))
         self.fichier.add_separator()
-        self.fichier.add_command(label='Vérifier les fichiers', command = lambda : self.verifyFiles())
+        self.fichier.add_command(label=self.language_dict["menufile3"][self.int_lang], command = lambda : self.verifyFiles())
         
-        self.application.add_command(label= "Recharger", command = lambda x = "all" : self.clear(x))
-        self.application.add_command(label= "Paramètres", command = lambda : self.openParameters())
-        self.application.add_command(label='Quitter', command = lambda : self.on_quit())
+        self.application.add_command(label= self.language_dict["menuapp1"][self.int_lang], command = lambda x = "all" : self.clear(x))
+        self.application.add_command(label= self.language_dict["menuapp2"][self.int_lang], command = lambda : self.openParameters())
+        self.application.add_command(label=self.language_dict["menuapp3"][self.int_lang], command = lambda : self.on_quit())
 
-        self.widget_menu.add_command(label='Ajouter un widget', command = lambda : self.widgetAdding())
-        self.widget_menu.add_command(label='Supprimer', command = lambda : self.delWid())
-        self.widget_menu.add_command(label='Modifier', command = lambda : self.modifyWid())
+        self.widget_menu.add_command(label=self.language_dict["menuwid1"][self.int_lang], command = lambda : self.widgetAdding())
+        self.widget_menu.add_command(label=self.language_dict["menuwid2"][self.int_lang], command = lambda : self.delWid())
+        self.widget_menu.add_command(label=self.language_dict["menuwid3"][self.int_lang], command = lambda : self.modifyWid())
         
 
-        self.code_menu.add_command(label='Copier le code', command = lambda : self.copyCode())
-        self.code_menu.add_command(label='Aperçu', command = lambda : self.openPreview())
+        self.code_menu.add_command(label=self.language_dict["menucode1"][self.int_lang], command = lambda : self.copyCode())
+        self.code_menu.add_command(label=self.language_dict["menucode2"][self.int_lang], command = lambda : self.openPreview())
 
 
-        self.menubar.add_cascade(label = "fichiers", menu = self.fichier)
-        self.menubar.add_cascade(label = "Application", menu = self.application)
-        self.menubar.add_cascade(label = "Widget", menu = self.widget_menu)
-        self.menubar.add_cascade(label = "Code", menu = self.code_menu)
+        self.menubar.add_cascade(label = self.language_dict["menufile"][self.int_lang], menu = self.fichier)
+        self.menubar.add_cascade(label = self.language_dict["menuapp"][self.int_lang], menu = self.application)
+        self.menubar.add_cascade(label = self.language_dict["menuwid"][self.int_lang], menu = self.widget_menu)
+        self.menubar.add_cascade(label = self.language_dict["menucode"][self.int_lang], menu = self.code_menu)
         
 
         #-------------------- création des widgets et des boutons d'actions --------------------
@@ -114,24 +119,24 @@ class interface(ct.CTk):
         self.code_output.configure(yscrollcommand=self.code_scrollbar.set)
 
         self.copy_bt = ct.CTkButton(self.code_frame, width= self.width*(10/100), height= self.height*(4/100),
-                                    text = "Copier", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, 
+                                    text = self.language_dict["menucode1"][self.int_lang], font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, 
                                     command = lambda : self.copyCode())
         self.preview_bt = ct.CTkButton(self.code_frame, width= self.width*(10/100), height= self.height*(4/100),
-                                       text = "Aperçu", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, 
+                                       text = self.language_dict["menucode2"][self.int_lang], font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, 
                                        command = lambda : self.openPreview())
 
 
         self.parameter_button = ct.CTkButton(self.actionbtframe, width= self.width*(10/100), height= self.height*(6/100),
-                                             text = "paramètres", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : self.openParameters())
+                                             text = self.language_dict["menuapp2"][self.int_lang], font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : self.openParameters())
         tl.CreateToolTip(self.parameter_button, text = "Bouton d'ouverture de la fenêtre de paramètres.") if self.showtooltip == "Oui" else None
 
         self.modify_button = ct.CTkButton(self.actionbtframe,  width= self.width*(10/100), height= self.height*(6/100),
-                                             text = "modifier", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : self.modifyWid())
+                                             text = self.language_dict["menuwid3"][self.int_lang], font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : self.modifyWid())
         tl.CreateToolTip(self.modify_button, text = "Bouton de modification des paramètres d'un widget.") if self.showtooltip == "Oui" else None
         self.modify_button.configure(state = "disabled") if self.actual_widget == None else None
 
         self.delete_button = ct.CTkButton(self.actionbtframe,  width= self.width*(10/100), height= self.height*(6/100),
-                                             text = "supprimer", font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : self.delWid())
+                                             text = self.language_dict["menuwid2"][self.int_lang], font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command = lambda : self.delWid())
         tl.CreateToolTip(self.delete_button, text = "Bouton de suppression d'un widget.") if self.showtooltip == "Oui" else None
         self.delete_button.configure(state = "disabled") if self.actual_widget == None else None
 
@@ -164,7 +169,7 @@ class interface(ct.CTk):
         """
         self.clear('itemFrame')
         
-        self.add_button = ct.CTkButton(self.main_item_frame, width= self.width*(16/100), height= 40, text = "Ajouter",border_width= 2, border_color = "#FFFFFF",
+        self.add_button = ct.CTkButton(self.main_item_frame, width= self.width*(16/100), height= 40, text = self.language_dict["add_label"][self.int_lang],border_width= 2, border_color = "#FFFFFF",
                                        font=ct.CTkFont(size=15, weight="bold"), corner_radius= 10, command= lambda : self.widgetAdding())
         tl.CreateToolTip(self.add_button, text = "Bouton d'ajout de widgets dans le projet.") if self.showtooltip == "Oui" else None
         self.add_button.configure(state = "disabled") if self.actual_project == None else None
@@ -259,8 +264,12 @@ class interface(ct.CTk):
                             self.values = self.actualwidset[0]["values"]
 
                         elif parameter == "command" :
-                            entry = ct.CTkButton(self.settings_frame, text = "Ajouter", command = lambda : self.openCommandTopLevel(self.actualwidset[0]["command"]))
+                            entry = ct.CTkButton(self.settings_frame, text = "Ajouter", command = lambda : self.openCommandTopLevel(self.actualwidset[0]["command"]), state = "disabled")
                             self.command = self.actualwidset[0]["command"]
+
+                        elif parameter == "variable" :
+                            entry = ct.CTkButton(self.settings_frame, text = "Ajouter", command = lambda : self.openVariableTopLevel(self.actualwidset[0]["varible"]), state = "disabled")
+                            self.command = self.actualwidset[0]["variable"]
                         
                         else :
                             entry = ct.CTkEntry(self.settings_frame, width = 100,font=ct.CTkFont(weight="bold"))
@@ -664,6 +673,9 @@ class interface(ct.CTk):
                 elif element[1] == "command" :
                     dico[element[1]] = self.command
 
+                elif element[1] == "variable" :
+                    dico[element[1]] = self.variable
+
                 else : 
                     dico[element[1]] = element[0].get()
             
@@ -695,6 +707,7 @@ class interface(ct.CTk):
             self.height  = self.parameters["height"]
         self.showtooltip = self.parameters["tooltip"]
         self.detail_lvl  = self.parameters["detail"]
+        self.int_lang    = self.parameters["int_language"]
 
         ct.set_default_color_theme(self.parameters["color"])
         ct.set_appearance_mode(self.parameters["theme"])
@@ -793,6 +806,15 @@ class interface(ct.CTk):
         self.app = None
 
 
+    def openVariableTopLevel(self, variable):
+        if self.app != None :
+            return
+        self.app = VariableTopLevelWin(variable = variable)
+        self.app.grab_set()
+        self.variable = self.actualwidset[0]["variable"] = self.app.contentGet()
+        self.app = None
+
+
 #-------------------- fonctions de création de fenêtres enfant --------------------
     
 
@@ -803,7 +825,7 @@ class interface(ct.CTk):
         """
         if self.project_app != None :
             return
-        self.project_app = ProjectApp(reason)
+        self.project_app = ProjectApp(reason, self.int_lang, self.language_dict)
         self.project_app.grab_set()
         self.actual_project = self.project_app.closed()
         self.project_app = None
@@ -823,7 +845,7 @@ class interface(ct.CTk):
         """
         if self.settings != None :
             return 
-        self.settings = AppEditing(self.parameters)
+        self.settings = AppEditing(self.parameters, self.int_lang, self.language_dict)
         self.settings.grab_set()
         self.parameters = self.settings.get()
         self.settings = None

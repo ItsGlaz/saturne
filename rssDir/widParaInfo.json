@@ -1,5 +1,5 @@
 {
-    "master": ["",1, "nom du widget parent"],
+    "master": ["window",1, "nom du widget parent"],
     "width":  [200,1, "largeur du widget"],
     "height":  [200,1, "hauteur du widget"],
     "corner_radius": ["None",1, "rayon de l'arrondi des coins"],

@@ -2,6 +2,7 @@ from typing import Tuple
 import customtkinter as ct
 from copy import deepcopy
 from tkinter import messagebox
+import intermediateLayer as interl
 
 class TextTopLevelWin(ct.CTkToplevel):
 
@@ -88,7 +89,7 @@ class ValuesTopLevelWin(ct.CTkToplevel):
             if entries[1] == cross :
                 entries[0].destroy()
                 entries[1].destroy()
-                del entries
+                del self.entries[self.entries.index(entries)]
 
 
     def on_quit(self):
@@ -123,7 +124,7 @@ class CommandTopLevelWin(ct.CTkToplevel):
         self.infotabview.add("Avec paramètres")
         self.infotabview.add("Sans paramètres")
 
-        self.lambda_label = ct.CTkLabel(self.infotabview.tab("Avec paramètres"), text = "comand = lambda : ", 
+        self.lambda_label = ct.CTkLabel(self.infotabview.tab("Avec paramètres"), text = "command = lambda : ", 
                                         font = ct.CTkFont(family = "arial", size = 15, weight = "bold"))
         
         self.lambda_command_entry = ct.CTkEntry(self.infotabview.tab("Avec paramètres"), width = 200, height = 30, 
@@ -237,6 +238,45 @@ class CommandTopLevelWin(ct.CTkToplevel):
             return False
         else :
             return True
+        
+
+class VariableTopLevelWin(ct.CTkToplevel):
+
+    def __init__(self, *args, variable : str = "None", fg_color: str | Tuple[str, str] | None = None, **kwargs):
+        super().__init__(*args, fg_color=fg_color, **kwargs)
+
+        self.choice = variable
+
+        self.label = ct.CTkLabel(self, text = "Variable :", font= ct.CTkFont(family = "arial", size=25, weight="bold"))
+        self.text_input = ct.CTkEntry(self, height= 30, width=250, font= ct.CTkFont(family = "arial", size=12, weight="bold"))
+        try : self.text_input.insert(0, self.choice)
+        except : pass
+        self.validate_bt = ct.CTkButton(self, text = "Valider", font= ct.CTkFont(family = "arial", size=15, weight="bold"), width= 100, command = lambda : self.contentValidation())
+        self.cancel_bt = ct.CTkButton(self, text = "Annuler", font= ct.CTkFont(family = "arial", size=15, weight="bold"), width= 100, command = lambda : self.on_quit())
+
+
+        self.label.grid(row = 0, column =0, columnspan = 2, padx = 10, pady = 10, sticky = "w")
+        self.text_input.grid(row = 1, column =0, columnspan = 2, padx = 10, pady = 10)
+        self.validate_bt.grid(row = 2, column =0, padx = 10, pady = 10)
+        self.cancel_bt.grid(row = 2, column =1, padx = 10, pady = 10)
+
+
+    def on_quit(self):
+        self.destroy()
+
+
+    def contentValidation(self):
+        if interl.tryWN(self.text_input.get()) :
+            self.choice = self.text_input.get()
+            self.destroy()
+        else : 
+            messagebox.showerror("Erreur d'entrée", "Le nom de variable ne correspond pas aux attentes de Python")
+            return
+        
+
+    def contentGet(self):
+        self.wait_window()
+        return self.choice
     
 
 if __name__ == "__main__":
