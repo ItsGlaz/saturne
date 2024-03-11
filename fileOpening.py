@@ -283,43 +283,6 @@ def mWS(path : str, newname : str, oldname : str, settings : dict) -> None :
 
 
 #-------------------------- Fonctions annexes --------------------------
-            
-
-def verifyApp() -> Union[str, bool]:
-    """verifyApp 
-    fonction de vérification que tous les fichiers de l'applications sont présents
-
-    Returns
-    -------
-    Union[str, bool]
-        renvoie True si tous les fichiers sont présents, renvoie le nom du fichier manquant sinon
-    """
-    path = os.getcwd()
-    cfiles = os.listdir(path)
-    if 'addWidgetTool.py' not in cfiles :
-        return 'addWidgetTool.py'
-    if "fileManagemt.py" not in cfiles :
-        return "fileManagemt.py"
-    if "projectApp.py" not in cfiles :
-        return "projectApp.py"
-    if "settingsApp.py" not in cfiles :
-        return "settingsApp.py"
-    if "widgetApp.py" not in cfiles :
-        return "widgetApp.py"
-    if "tool_tip.py" not in cfiles :
-        return "tool_tip.py"
-    cfiles =os.listdir(path + "\\" + "rssDir")
-    if 'prjctNameSave.txt' not in cfiles :
-        return "prjctNameSave.txt"
-    if "wdSettings.json" not in cfiles :
-        return "wdSettings.json"
-    if "widgetInfo.json" not in cfiles :
-        return "widgetInfo.json"
-    if "widgetRss.json" not in cfiles :
-        return "widgetRss.json"
-    if "widParaInfo.json" not in cfiles :
-        return "widParaInfo.json"
-    return True
 
 
 def loadInfo(path : str = None, data : str = 'prjctInfo') -> Union[dict, list, None]:
@@ -413,7 +376,3 @@ def wCode(project, code):
     with open(path, "w", encoding= 'utf8') as file :
         file.writelines(code)
     file.close()
-           
-
-if __name__ == "__main__" :
-    print(verifyApp())

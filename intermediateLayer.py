@@ -43,7 +43,7 @@ def modidyPrjctRqst(name : str, dico : dict) -> None:
     path = fileop.createPath(name)
     old_data = fileop.loadInfo(path)
     path = fileop.createPath(name + "\\" + "code.py")
-    code = codeGen.mWinCode( old_data, dico, path)
+    code = codeGen.mWinCode(old_data, dico, path)
     fileop.wCode(name, code)
     flmngt.modifyPrjtInfo(name, dico)
 
@@ -92,28 +92,6 @@ def getSetsInfoRqst() -> dict:
         dictionnaire des données de chaque paramètre dans tkinter
     """
     return fileop.loadInfo(data = 'setsinfo')
-
-
-def verifyFilesRqst()-> list:
-    """verifyFilesRqst 
-    Envoie une requête de vérification de l'intégrité de l'application
-
-    Returns
-    -------
-    list
-        renvoie le nom du fichier ou du projet altéré, et son type (file ou project)
-        si il n'y a pas d'erreur, l'élément 0 de la liste est True
-    """
-    path = fileop.createPath("rssDir")
-    with open(path + "\\" + "prjctNameSave.txt", 'r') as file :
-        prjts = file.read()
-        prjts.split(",")
-    file.close()
-    for projects in prjts :
-        print(projects)
-        if not  fileop.verifyDir(fileop.createPath(projects)) :
-            return [projects, 'project']
-    return [fileop.verifyApp(), 'file']
 
 
 def getWidNameListReq(project : str) -> list:

@@ -197,7 +197,7 @@ class ProjectApp(ct.CTkToplevel):
                 bt.grid(padx = 10, pady = 5)
 
 
-    def addProject(self, event):
+    def addProject(self, event = None):
         self.newprojectname = self.entry.get()
         self.project_info.append(self.newprojectname)
         converted_info = ",".join(self.project_info)
@@ -249,8 +249,3 @@ class ProjectApp(ct.CTkToplevel):
     def closed(self):
         self.master.wait_window(self)  
         return self.actual_prjt
-        
-
-if __name__ == "__main__" :
-    testapp = ProjectApp("new")
-    testapp.mainloop()
