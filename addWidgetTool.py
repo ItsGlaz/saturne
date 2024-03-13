@@ -26,6 +26,9 @@ class AddWidgetTool(ct.CTk):
 
 
     def frameCreation(self):
+        '''frameCreation
+        fonction de créationde  la frame losque que l'on lance addWidgetTool seul
+        '''
         self.entry_name = ct.CTkEntry(self.upper_frame, width=200)
         self.entry_name.insert(0, 'nom du widget')
         
@@ -51,18 +54,34 @@ class AddWidgetTool(ct.CTk):
 
 
     def addtoListe(self, add : str):
+        """addtoListe
+        ajoute a la liste self.entries de la class AddWidgetTool
+        
+        Parameters
+        ----------
+        add : str
+            parametre donner par frameCreation grace aux CheckBox
+        """
         if add not in self.entries :
             self.entries.append(add)
             print(add)
 
 
     def readFile(self):
+        """readFile
+        fonction de lecture du document:"rssDir\widgetInfo.json"et le met à self.widget_info
+        """
         with open("rssDir\widgetInfo.json", "r") as file :
             self.widget_info = json.load(file)
         file.close()
 
 
     def addWidgetParameter(self):
+        """addWidgetParameter
+        fonction ouvre le document:"rssDir\widgetRss.json" et recupere les infos
+                enregistre les info dans "rssDir\widgetRss.json"
+                enregistre self.widget_info dans "rssDir\widgetInfo.json"
+        """
         dico = {}
         dico["name"]        = self.entry_name.get()
         dico["id"]          = self.entry_id.get()
@@ -89,6 +108,9 @@ class AddWidgetTool(ct.CTk):
 
 
     def clear(self):
+        """clear
+        fonction qui vide self.upper_frame.grid_slaves() + self.lower_frame.grid_slaves()
+        """
         liste = self.upper_frame.grid_slaves() + self.lower_frame.grid_slaves()
         for element in liste :
             element.destroy()
