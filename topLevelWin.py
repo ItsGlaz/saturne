@@ -25,15 +25,29 @@ class TextTopLevelWin(ct.CTkToplevel):
 
 
     def on_quit(self):
+        """on_quit
+        fonction du bouton "Annuler" lors d'ajout d'un texte à un widget
+        """
         self.destroy()
 
 
     def contentValidation(self):
+        """contentValidation
+        fonctiondu bouton "Valider" lors d'ajout d'un texte à un widget
+        """
         self.choice = self.text_input.get()
         self.destroy()
         
 
     def contentGet(self):
+        """contentGet
+        fonction du boutou "Ajouter" qui ouvre la fenetre pour ajouter un texte à un widget
+        
+        Returns
+        -------
+        self.choice
+            texte qu'on ajoute/modifie
+        """
         self.wait_window()
         return self.choice
 
@@ -71,9 +85,13 @@ class ValuesTopLevelWin(ct.CTkToplevel):
 
 
     def addValue(self):
+        """addValue
+        
+        """
         entry = ct.CTkEntry(self, height= 30, width=200, font= ct.CTkFont(family = "arial", size=15, weight="bold"))
         cross_bt = ct.CTkButton(self, text = "X", font= ct.CTkFont(family = "arial", size=15, weight="bold"), text_color="#FC2626", width= 20)
         cross_bt.configure(command= lambda x= cross_bt : self.delValue(x))
+        
         
         self.entries.append((entry, cross_bt))
         

@@ -27,7 +27,7 @@ class AddWidgetTool(ct.CTk):
 
     def frameCreation(self):
         '''frameCreation
-        fonction de créationde  la frame losque que l'on lance addWidgetTool seul
+        fonction de création de  la frame losque que l'on lance addWidgetTool seul
         '''
         self.entry_name = ct.CTkEntry(self.upper_frame, width=200)
         self.entry_name.insert(0, 'nom du widget')

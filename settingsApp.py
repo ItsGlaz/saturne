@@ -172,12 +172,19 @@ class AppEditing(ct.CTkToplevel):
 
 
     def quitSettings(self):
-        on_quit = messagebox.askyesno("Qitter les paramètres", "Voulez-vous quitter les paramètres ?\n(les modifications ne seront pas enregistrées).")
+        """quitSettings
+        fonction qui ouvre un message quand "Annuler" sur la fenetre des paramètres
+        et detruit le fenetre sur "oui"
+        """
+        on_quit = messagebox.askyesno("Quitter les paramètres", "Voulez-vous quitter les paramètres ?\n(les modifications ne seront pas enregistrées).")
         if on_quit :
             self.destroy()
 
 
     def applySettings(self):
+        """applySettings
+        fonction qui JE PENSE met en place les nouveaux paramètre ajouter/modifer
+        """
         try :
             self.parameters["width"] = int(self.screen_width.get())
         except any as error :
@@ -229,6 +236,14 @@ class AppEditing(ct.CTkToplevel):
 
 
     def get(self):
+        """get
+        fonction qui recupere les paramètres
+
+        Returns
+        -------
+        dict
+            renvoie les paramètres de ProjectApp
+        """
         self.master.wait_window(self)
         return self.parameters
     

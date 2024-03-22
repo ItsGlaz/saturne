@@ -27,16 +27,31 @@ class WidgetApp(ct.CTkToplevel):
 
 
     def getWidget(self):
+        """getWidget
+        fonction qui ouvre le document "rssDir\widgetRss.json" et récupère la liste des widgets widgets_list
+        """
         with open("rssDir\widgetRss.json", "r", encoding= 'utf8') as file :
             self.widgets_list = json.load(file)
         file.close()
 
 
     def choiceDone(self, choice):
+        """choiceDone
+        fonction
+        
+        Parameters
+        ----------
+        str
+            nom du widget qu'on a choisit d'ajouter
+        """
         self.choice = choice
         self.destroy()
 
 
     def get(self):
+        """get
+
+        """
+        
         self.master.wait_window(self)
         return self.choice

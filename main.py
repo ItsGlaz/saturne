@@ -304,7 +304,9 @@ class interface(ct.CTk):
 
 
     def codeFrame(self):
-        #permet d'afficher le code de l'interface
+        """codeFrame
+        permet d'afficher le code de l'interface
+        """
         self.txt_code = interl.getCodeReq(self.actual_project)
         if self.txt_code == None :
             messagebox.showerror("Erreur d'affichage", "Une erreur est survenue lors de l'affichage du code.")
@@ -773,6 +775,9 @@ class interface(ct.CTk):
 
 
     def openPreview(self):
+        """openPreview
+        fonction qui lance le code généré sur la gauche
+        """
         document = interl.getProjectPath(self.actual_project) + "\code.py"
         with open(document,"r")as file:
             code = file.read()
@@ -781,6 +786,13 @@ class interface(ct.CTk):
         
 
     def openTextTopLevel(self, text):
+        """openTextToplevel
+        Parameters
+        ----------
+        text:
+            
+        
+        """
         if self.app != None :
             return
         self.app = TextTopLevelWin(text = text)
